@@ -7,6 +7,7 @@ import java.util.Set;
 public class Conversation {
 
     private final Set<ParticipantId> participants = new HashSet<>();
+    private final Set<Message> messages = new HashSet<>();
 
     public void joinedBy(ParticipantId participantId) {
         assertNotNull(participantId);
@@ -33,5 +34,17 @@ public class Conversation {
 
     public boolean isJoined(ParticipantId participantId) {
         return participants.contains(participantId);
+    }
+
+    public Set<Message> messages() {
+        return messages;
+    }
+
+    public void messageSent(Message message) {
+        messages.add(message);
+    }
+
+    public void deleteMessage(Message message) {
+        messages.remove(message);
     }
 }
