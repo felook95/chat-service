@@ -69,6 +69,24 @@ public class ChatServiceTest {
     }
 
     @Test
+    void createMessageWithContentStoresMessage() {
+        ChatService chatService = ChatServiceFactory.withDefaults();
+
+        Message message = chatService.createMessageWith(MessageContent.of(""));
+
+        Message foundMessage = chatService.findMessageById(message.id());
+        assertThat(message).isEqualTo(foundMessage);
+    }
+
+    @Test
+    void notFoundMessageThrowsMessageNotFoundException() {
+        ChatService chatService = ChatServiceFactory.withDefaults();
+
+        assertThatThrownBy(() -> chatService.findMessageById(MessageId.of(1L)))
+                .isInstanceOf(MessageNotFoundException.class);
+    }
+
+    @Test
     void sentMessageAddingToConversation() {
         ChatService chatService = ChatServiceFactory.withDefaults();
         Conversation conversation = chatService.createConversation();
