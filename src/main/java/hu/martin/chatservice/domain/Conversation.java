@@ -7,16 +7,20 @@ import java.util.Set;
 public class Conversation {
 
     private final Set<ParticipantId> participants = new HashSet<>();
-    private final Set<Message> messages = new HashSet<>();
+
+    private final Set<MessageId> messages = new HashSet<>();
+
+    private final Set<MessageId> deletedMessages = new HashSet<>();
+
 
     public void joinedBy(ParticipantId participantId) {
-        assertNotNull(participantId);
+        assertNotNull(participantId, "participantId must not be null!");
         participants.add(participantId);
     }
 
-    private void assertNotNull(ParticipantId participantId) {
-        if (participantId == null) {
-            throw new IllegalArgumentException("participantId must not be null!");
+    private void assertNotNull(Object object, String message) {
+        if (object == null) {
+            throw new IllegalArgumentException(message);
         }
     }
 
@@ -36,15 +40,21 @@ public class Conversation {
         return participants.contains(participantId);
     }
 
-    public Set<Message> messages() {
+    public Set<MessageId> messages() {
         return messages;
     }
 
-    public void messageSent(Message message) {
-        messages.add(message);
+    public void messageSent(MessageId messageId) {
+        assertNotNull(messageId,"messageId must not be null!");
+        messages.add(messageId);
     }
 
-    public void deleteMessage(Message message) {
-        messages.remove(message);
+    public void deleteMessage(MessageId messageId) {
+        messages.remove(messageId);
+        deletedMessages.add(messageId);
+    }
+
+    public Set<MessageId> deletedMessages() {
+        return deletedMessages;
     }
 }

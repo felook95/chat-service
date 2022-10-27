@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Tag("unitTest")
 public class ConversationMessagingTest {
@@ -17,24 +18,30 @@ public class ConversationMessagingTest {
 
     @Test
     void messageStoredInConversation() {
-        ParticipantId senderParticipantId = ParticipantId.of(1L);
         Conversation conversation = new Conversation();
-        Message message = new Message(senderParticipantId, "Test message");
+        MessageId messageId = MessageId.of(1L);
 
-        conversation.messageSent(message);
+        conversation.messageSent(messageId);
 
-        assertThat(conversation.messages()).contains(message);
+        assertThat(conversation.messages()).contains(messageId);
     }
 
     @Test
     void messageDeletedFromConversation() {
         Conversation conversation = new Conversation();
-        ParticipantId senderParticipantId = ParticipantId.of(1L);
-        Message message = new Message(senderParticipantId, "Test message");
-        conversation.messageSent(message);
+        MessageId messageId = MessageId.of(1L);
+        conversation.messageSent(messageId);
 
-        conversation.deleteMessage(message);
+        conversation.deleteMessage(messageId);
 
-        assertThat(conversation.messages()).doesNotContain(message);
+        assertThat(conversation.deletedMessages()).contains(messageId);
+        assertThat(conversation.messages()).doesNotContain(messageId);
+    }
+
+    @Test
+    void nullMessageThrowsException() {
+        Conversation conversation = new Conversation();
+
+        assertThatThrownBy(() -> conversation.messageSent(null)).isInstanceOf(IllegalArgumentException.class);
     }
 }
