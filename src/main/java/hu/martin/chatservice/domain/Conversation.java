@@ -6,12 +6,11 @@ import java.util.Set;
 
 public class Conversation {
 
+    private ConversationId conversationId;
+
     private final Set<ParticipantId> participants = new HashSet<>();
 
     private final Set<MessageId> messages = new HashSet<>();
-
-    private final Set<MessageId> deletedMessages = new HashSet<>();
-
 
     public void joinedBy(ParticipantId participantId) {
         assertNotNull(participantId, "participantId must not be null!");
@@ -45,16 +44,20 @@ public class Conversation {
     }
 
     public void messageSent(MessageId messageId) {
-        assertNotNull(messageId,"messageId must not be null!");
+        assertNotNull(messageId, "messageId must not be null!");
         messages.add(messageId);
     }
 
     public void deleteMessage(MessageId messageId) {
+        assertNotNull(messageId, "messageId must not be null!");
         messages.remove(messageId);
-        deletedMessages.add(messageId);
     }
 
-    public Set<MessageId> deletedMessages() {
-        return deletedMessages;
+    public ConversationId id() {
+        return conversationId;
+    }
+
+    public void setId(ConversationId conversationId) {
+        this.conversationId = conversationId;
     }
 }

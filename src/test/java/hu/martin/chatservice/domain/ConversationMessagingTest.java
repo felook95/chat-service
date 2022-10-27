@@ -34,7 +34,6 @@ public class ConversationMessagingTest {
 
         conversation.deleteMessage(messageId);
 
-        assertThat(conversation.deletedMessages()).contains(messageId);
         assertThat(conversation.messages()).doesNotContain(messageId);
     }
 

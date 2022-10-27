@@ -18,11 +18,20 @@ public class MessageTest {
 
     @Test
     void editMessageContent() {
-        Message message = new Message(new MessageContent("Original content"));
+        Message message = new Message(MessageContent.of("Original content"));
         MessageContent modifiedContent = new MessageContent("Modified content");
 
         message.changeContentTo(modifiedContent);
 
         assertThat(message.content()).isEqualTo(modifiedContent);
+    }
+
+    @Test
+    void deleteMessageSetsStatusFlagToDeleted() {
+        Message message = new Message(MessageContent.of(""));
+
+        message.deleted();
+
+        assertThat(message.statusFlag()).isEqualTo(MessageStatus.DELETED);
     }
 }
