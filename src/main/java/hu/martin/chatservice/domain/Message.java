@@ -7,8 +7,12 @@ public class Message {
     private MessageContent content;
     private MessageStatus statusFlag;
 
-    public Message(MessageContent content) {
+    private final CreatedDateTime createdDateTime;
+
+    public Message(MessageContent content, CreatedDateTime createdDateTime) {
         changeContentTo(content);
+        changeStatusFlagTo(MessageStatus.CREATED);
+        this.createdDateTime = createdDateTime;
     }
 
     public void changeContentTo(MessageContent content) {
@@ -33,5 +37,13 @@ public class Message {
 
     public void setId(MessageId id) {
         this.id = id;
+    }
+
+    public CreatedDateTime createdDateTime() {
+        return createdDateTime;
+    }
+
+    public void changeStatusFlagTo(MessageStatus newStatusFlag) {
+        this.statusFlag = newStatusFlag;
     }
 }

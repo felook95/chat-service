@@ -6,7 +6,9 @@ import hu.martin.chatservice.domain.MessageId;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 public class InMemoryMessageRepository implements MessageRepository {
 
@@ -26,5 +28,12 @@ public class InMemoryMessageRepository implements MessageRepository {
     @Override
     public Optional<Message> findById(MessageId messageId) {
         return Optional.ofNullable(messages.get(messageId));
+    }
+
+    @Override
+    public Set<Message> findByIds(Set<MessageId> messageIdsToLookFor) {
+        return messages.values().stream()
+                .filter(message -> messageIdsToLookFor.contains(message.id()))
+                .collect(Collectors.toSet());
     }
 }

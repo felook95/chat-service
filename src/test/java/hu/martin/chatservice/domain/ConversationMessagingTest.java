@@ -27,17 +27,6 @@ public class ConversationMessagingTest {
     }
 
     @Test
-    void messageDeletedFromConversation() {
-        Conversation conversation = new Conversation();
-        MessageId messageId = MessageId.of(1L);
-        conversation.messageSent(messageId);
-
-        conversation.deleteMessage(messageId);
-
-        assertThat(conversation.messages()).doesNotContain(messageId);
-    }
-
-    @Test
     void nullMessageThrowsException() {
         Conversation conversation = new Conversation();
 

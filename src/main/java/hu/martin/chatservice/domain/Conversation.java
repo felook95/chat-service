@@ -48,11 +48,6 @@ public class Conversation {
         messages.add(messageId);
     }
 
-    public void deleteMessage(MessageId messageId) {
-        assertNotNull(messageId, "messageId must not be null!");
-        messages.remove(messageId);
-    }
-
     public ConversationId id() {
         return conversationId;
     }

@@ -2,8 +2,11 @@ package hu.martin.chatservice.application;
 
 import hu.martin.chatservice.domain.*;
 
+import java.util.Collection;
+import java.util.Set;
+
 public interface ChatService {
-    Conversation createConversation();
+    Conversation startConversation();
 
     Conversation findConversationById(ConversationId id);
 
@@ -13,7 +16,11 @@ public interface ChatService {
 
     void sendMessageTo(MessageId messageId, ConversationId conversationId);
 
-    void deleteMessageFrom(MessageId messageId, ConversationId conversationId);
+    Message receiveMessage(MessageContent messageContent, CreatedDateTime createdDateTime);
 
-    Message createMessageWith(MessageContent messageContent);
+    void deleteMessage(MessageId messageId);
+
+    Set<Message> messagesFrom(ConversationId conversationId);
+
+    Collection<Message> messagesByChronologicalOrderFrom(ConversationId conversationId);
 }

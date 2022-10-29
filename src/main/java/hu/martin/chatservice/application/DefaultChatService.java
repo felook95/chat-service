@@ -4,6 +4,11 @@ import hu.martin.chatservice.application.port.ConversationRepository;
 import hu.martin.chatservice.application.port.MessageRepository;
 import hu.martin.chatservice.domain.*;
 
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 public class DefaultChatService implements ChatService {
 
     private final ConversationRepository conversationRepository;
@@ -15,7 +20,7 @@ public class DefaultChatService implements ChatService {
     }
 
     @Override
-    public Conversation createConversation() {
+    public Conversation startConversation() {
         Conversation conversation = new Conversation();
         return conversationRepository.save(conversation);
     }
@@ -45,16 +50,31 @@ public class DefaultChatService implements ChatService {
     }
 
     @Override
-    public void deleteMessageFrom(MessageId messageId, ConversationId conversationId) {
-        Conversation conversation = findConversationById(conversationId);
-        conversation.deleteMessage(messageId);
+    public void deleteMessage(MessageId messageId) {
         Message foundMessage = findMessageById(messageId);
         foundMessage.deleted();
-        conversationRepository.save(conversation);
+        messageRepository.save(foundMessage);
     }
 
     @Override
-    public Message createMessageWith(MessageContent messageContent) {
-        return messageRepository.save(new Message(messageContent));
+    public Message receiveMessage(MessageContent messageContent, CreatedDateTime createdDateTime) {
+        return messageRepository.save(new Message(messageContent, createdDateTime));
+    }
+
+    @Override
+    public Collection<Message> messagesByChronologicalOrderFrom(ConversationId conversationId) {
+        return messagesFrom(conversationId).stream()
+                .sorted(Comparator.comparing(Message::createdDateTime))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Set<Message> messagesFrom(ConversationId conversationId) {
+        Set<MessageId> messageIdsInConversation = findConversationById(conversationId).messages();
+        return messagesByIds(messageIdsInConversation);
+    }
+
+    private Set<Message> messagesByIds(Set<MessageId> messageIdsInConversation) {
+        return messageRepository.findByIds(messageIdsInConversation);
     }
 }
