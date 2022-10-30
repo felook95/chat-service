@@ -2,60 +2,58 @@ package hu.martin.chatservice.domain;
 
 public class Message {
 
-    private MessageId id;
+  private final CreatedDateTime createdDateTime;
+  private MessageId id;
+  private MessageContent content;
+  private MessageStatus statusFlag;
 
-    private MessageContent content;
-    private MessageStatus statusFlag;
+  public Message(MessageContent content, CreatedDateTime createdDateTime) {
+    this.content = content;
+    this.statusFlag = MessageStatus.CREATED;
+    this.createdDateTime = createdDateTime;
+  }
 
-    private final CreatedDateTime createdDateTime;
+  public void changeContentTo(MessageContent content) {
+    assertNotDeleted();
+    this.content = content;
+    edited();
+  }
 
-    public Message(MessageContent content, CreatedDateTime createdDateTime) {
-        this.content = content;
-        this.statusFlag = MessageStatus.CREATED;
-        this.createdDateTime = createdDateTime;
+  private void assertNotDeleted() {
+    if (MessageStatus.DELETED.equals(statusFlag())) {
+      throw new IllegalStateException("Deleted message cannot be edited");
     }
+  }
 
-    public void changeContentTo(MessageContent content) {
-        assertNotDeleted();
-        this.content = content;
-        edited();
-    }
+  private void edited() {
+    changeStatusFlagTo(MessageStatus.EDITED);
+  }
 
-    private void assertNotDeleted() {
-        if (MessageStatus.DELETED.equals(statusFlag())) {
-            throw new IllegalStateException("Deleted message cannot be edited");
-        }
-    }
+  public MessageContent content() {
+    return content;
+  }
 
-    private void edited() {
-        changeStatusFlagTo(MessageStatus.EDITED);
-    }
+  public void deleted() {
+    statusFlag = MessageStatus.DELETED;
+  }
 
-    public MessageContent content() {
-        return content;
-    }
+  public MessageStatus statusFlag() {
+    return statusFlag;
+  }
 
-    public void deleted() {
-        statusFlag = MessageStatus.DELETED;
-    }
+  public MessageId id() {
+    return id;
+  }
 
-    public MessageStatus statusFlag() {
-        return statusFlag;
-    }
+  public void setId(MessageId id) {
+    this.id = id;
+  }
 
-    public MessageId id() {
-        return id;
-    }
+  public CreatedDateTime createdDateTime() {
+    return createdDateTime;
+  }
 
-    public void setId(MessageId id) {
-        this.id = id;
-    }
-
-    public CreatedDateTime createdDateTime() {
-        return createdDateTime;
-    }
-
-    public void changeStatusFlagTo(MessageStatus newStatusFlag) {
-        this.statusFlag = newStatusFlag;
-    }
+  public void changeStatusFlagTo(MessageStatus newStatusFlag) {
+    this.statusFlag = newStatusFlag;
+  }
 }

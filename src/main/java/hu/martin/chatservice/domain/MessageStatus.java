@@ -1,7 +1,7 @@
 package hu.martin.chatservice.domain;
 
 public enum MessageStatus {
-    CREATED,
-    EDITED,
-    DELETED
+  CREATED,
+  EDITED,
+  DELETED
 }

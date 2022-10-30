@@ -6,53 +6,51 @@ import java.util.Set;
 
 public class Conversation {
 
-    private ConversationId conversationId;
+  private final Set<ParticipantId> participants = new HashSet<>();
+  private final Set<MessageId> messages = new HashSet<>();
+  private ConversationId conversationId;
 
-    private final Set<ParticipantId> participants = new HashSet<>();
+  public void joinedBy(ParticipantId participantId) {
+    assertNotNull(participantId, "participantId must not be null!");
+    participants.add(participantId);
+  }
 
-    private final Set<MessageId> messages = new HashSet<>();
-
-    public void joinedBy(ParticipantId participantId) {
-        assertNotNull(participantId, "participantId must not be null!");
-        participants.add(participantId);
+  private void assertNotNull(Object object, String message) {
+    if (object == null) {
+      throw new IllegalArgumentException(message);
     }
+  }
 
-    private void assertNotNull(Object object, String message) {
-        if (object == null) {
-            throw new IllegalArgumentException(message);
-        }
-    }
+  public boolean hasParticipant(ParticipantId participantId) {
+    return participants.contains(participantId);
+  }
 
-    public boolean hasParticipant(ParticipantId participantId) {
-        return participants.contains(participantId);
-    }
+  public Set<ParticipantId> participants() {
+    return Collections.unmodifiableSet(participants);
+  }
 
-    public Set<ParticipantId> participants() {
-        return Collections.unmodifiableSet(participants);
-    }
+  public void leftBy(ParticipantId participantId) {
+    participants.remove(participantId);
+  }
 
-    public void leftBy(ParticipantId participantId) {
-        participants.remove(participantId);
-    }
+  public boolean isJoined(ParticipantId participantId) {
+    return participants.contains(participantId);
+  }
 
-    public boolean isJoined(ParticipantId participantId) {
-        return participants.contains(participantId);
-    }
+  public Set<MessageId> messages() {
+    return messages;
+  }
 
-    public Set<MessageId> messages() {
-        return messages;
-    }
+  public void messageSent(MessageId messageId) {
+    assertNotNull(messageId, "messageId must not be null!");
+    messages.add(messageId);
+  }
 
-    public void messageSent(MessageId messageId) {
-        assertNotNull(messageId, "messageId must not be null!");
-        messages.add(messageId);
-    }
+  public ConversationId id() {
+    return conversationId;
+  }
 
-    public ConversationId id() {
-        return conversationId;
-    }
-
-    public void setId(ConversationId conversationId) {
-        this.conversationId = conversationId;
-    }
+  public void setId(ConversationId conversationId) {
+    this.conversationId = conversationId;
+  }
 }

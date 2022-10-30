@@ -1,26 +1,32 @@
 package hu.martin.chatservice.application;
 
-import hu.martin.chatservice.domain.*;
-
+import hu.martin.chatservice.domain.Conversation;
+import hu.martin.chatservice.domain.ConversationId;
+import hu.martin.chatservice.domain.CreatedDateTime;
+import hu.martin.chatservice.domain.Message;
+import hu.martin.chatservice.domain.MessageContent;
+import hu.martin.chatservice.domain.MessageId;
+import hu.martin.chatservice.domain.ParticipantId;
 import java.util.Collection;
 import java.util.Set;
 
 public interface ChatService {
-    Conversation startConversation();
 
-    Conversation findConversationById(ConversationId id);
+  Conversation startConversation();
 
-    Message findMessageById(MessageId id);
+  Conversation findConversationById(ConversationId id);
 
-    void joinParticipantTo(ConversationId conversationId, ParticipantId participantId);
+  Message findMessageById(MessageId id);
 
-    void sendMessageTo(MessageId messageId, ConversationId conversationId);
+  void joinParticipantTo(ConversationId conversationId, ParticipantId participantId);
 
-    Message receiveMessage(MessageContent messageContent, CreatedDateTime createdDateTime);
+  void sendMessageTo(MessageId messageId, ConversationId conversationId);
 
-    void deleteMessage(MessageId messageId);
+  Message receiveMessage(MessageContent messageContent, CreatedDateTime createdDateTime);
 
-    Set<Message> messagesFrom(ConversationId conversationId);
+  void deleteMessage(MessageId messageId);
 
-    Collection<Message> messagesByChronologicalOrderFrom(ConversationId conversationId);
+  Set<Message> messagesFrom(ConversationId conversationId);
+
+  Collection<Message> messagesByChronologicalOrderFrom(ConversationId conversationId);
 }
