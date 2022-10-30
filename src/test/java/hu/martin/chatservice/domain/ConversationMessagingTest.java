@@ -23,7 +23,7 @@ public class ConversationMessagingTest {
 
     conversation.messageSent(messageId);
 
-    assertThat(conversation.messages()).contains(messageId);
+    assertThat(conversation.messages()).containsOnly(messageId);
   }
 
   @Test

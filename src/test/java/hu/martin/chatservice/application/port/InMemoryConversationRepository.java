@@ -14,10 +14,10 @@ public class InMemoryConversationRepository implements ConversationRepository {
 
   @Override
   public Conversation save(Conversation conversation) {
-    if (conversation.id() == null) {
+    if (conversation.getId() == null) {
       conversation.setId(ConversationId.of(sequence.getAndIncrement()));
     }
-    conversations.put(conversation.id(), conversation);
+    conversations.put(conversation.getId(), conversation);
     return conversation;
   }
 

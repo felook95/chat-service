@@ -35,7 +35,7 @@ public class ConversationServiceTest {
 
     Conversation conversation = conversationService.startConversation();
 
-    assertThat(conversation.id()).isNotNull();
+    assertThat(conversation.getId()).isNotNull();
   }
 
   @Test
@@ -45,7 +45,7 @@ public class ConversationServiceTest {
     Conversation conversation1 = conversationService.startConversation();
     Conversation conversation2 = conversationService.startConversation();
 
-    assertThat(conversation1.id()).isNotEqualTo(conversation2.id());
+    assertThat(conversation1.getId()).isNotEqualTo(conversation2.getId());
   }
 
   @Test
@@ -53,7 +53,7 @@ public class ConversationServiceTest {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
     Conversation createdConversation = conversationService.startConversation();
 
-    Conversation foundConversation = conversationService.findConversationById(createdConversation.id());
+    Conversation foundConversation = conversationService.findConversationById(createdConversation.getId());
 
     assertThat(createdConversation).isEqualTo(foundConversation);
   }
@@ -72,9 +72,9 @@ public class ConversationServiceTest {
     Conversation conversation = conversationService.startConversation();
     ParticipantId participantId = ParticipantId.of(1L);
 
-    conversationService.joinParticipantTo(conversation.id(), participantId);
+    conversationService.joinParticipantTo(conversation.getId(), participantId);
 
-    Conversation foundConversation = conversationService.findConversationById(conversation.id());
+    Conversation foundConversation = conversationService.findConversationById(conversation.getId());
     assertThat(foundConversation.participants()).containsOnly(participantId);
   }
 
@@ -119,9 +119,9 @@ public class ConversationServiceTest {
     Message message = conversationService.receiveMessage(
         MessageContent.of(""), CreatedDateTime.of(ZonedDateTime.now().plusDays(0)));
 
-    conversationService.sendMessageTo(message.id(), conversation.id());
+    conversationService.sendMessageTo(message.id(), conversation.getId());
 
-    Conversation foundConversation = conversationService.findConversationById(conversation.id());
+    Conversation foundConversation = conversationService.findConversationById(conversation.getId());
     assertThat(foundConversation.messages()).containsOnly(message.id());
   }
 
@@ -142,7 +142,7 @@ public class ConversationServiceTest {
   @Test
   void messagesForConversationReturnsAllMessages() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    ConversationId conversationId = conversationService.startConversation().id();
+    ConversationId conversationId = conversationService.startConversation().getId();
 
     MessageId messageId = conversationService.receiveMessage(
         MessageContent.of("1"),
@@ -162,7 +162,7 @@ public class ConversationServiceTest {
   @Test
   void conversationReturnsMessagesInChronologicalOrder() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    ConversationId conversationId = conversationService.startConversation().id();
+    ConversationId conversationId = conversationService.startConversation().getId();
     CreatedDateTime oldestDateTime = CreatedDateTime.of(ZonedDateTime.now().plusDays(3));
     CreatedDateTime mostRecentDateTime = CreatedDateTime.of(ZonedDateTime.now().plusDays(0));
     CreatedDateTime middleDateTime = CreatedDateTime.of(ZonedDateTime.now().plusDays(2));

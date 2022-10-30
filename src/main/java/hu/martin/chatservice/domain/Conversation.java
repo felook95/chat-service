@@ -46,7 +46,7 @@ public class Conversation {
     messages.add(messageId);
   }
 
-  public ConversationId id() {
+  public ConversationId getId() {
     return conversationId;
   }
 
