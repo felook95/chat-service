@@ -10,13 +10,25 @@ public class Message {
     private final CreatedDateTime createdDateTime;
 
     public Message(MessageContent content, CreatedDateTime createdDateTime) {
-        changeContentTo(content);
-        changeStatusFlagTo(MessageStatus.CREATED);
+        this.content = content;
+        this.statusFlag = MessageStatus.CREATED;
         this.createdDateTime = createdDateTime;
     }
 
     public void changeContentTo(MessageContent content) {
+        assertNotDeleted();
         this.content = content;
+        edited();
+    }
+
+    private void assertNotDeleted() {
+        if (MessageStatus.DELETED.equals(statusFlag())) {
+            throw new IllegalStateException("Deleted message cannot be edited");
+        }
+    }
+
+    private void edited() {
+        changeStatusFlagTo(MessageStatus.EDITED);
     }
 
     public MessageContent content() {

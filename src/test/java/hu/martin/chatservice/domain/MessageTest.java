@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.time.ZonedDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Tag("unitTest")
 public class MessageTest {
@@ -39,13 +40,36 @@ public class MessageTest {
 
     @Test
     void editMessageContent() {
-        Message message = new Message(MessageContent.of("Original content"), CreatedDateTime.of(ZonedDateTime.now()));
+        Message message = new Message(
+                MessageContent.of("Original content"), CreatedDateTime.of(ZonedDateTime.now())
+        );
         MessageContent modifiedContent = new MessageContent("Modified content");
 
         message.changeContentTo(modifiedContent);
 
         assertThat(message.content()).isEqualTo(modifiedContent);
     }
+
+    @Test
+    void editingMessageContentChangesMessageStatusToEdited() {
+        Message message = new Message(
+                MessageContent.of("Original content"), CreatedDateTime.of(ZonedDateTime.now())
+        );
+
+        message.changeContentTo(MessageContent.of("Modified content"));
+
+        assertThat(message.statusFlag()).isEqualTo(MessageStatus.EDITED);
+    }
+
+    @Test
+    void editingADeletedMessageThrowsException() {
+        Message message = new Message(MessageContent.of("Original content"), CreatedDateTime.of(ZonedDateTime.now()));
+        message.deleted();
+
+        assertThatThrownBy(() -> message.changeContentTo(MessageContent.of("Modified content")))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
 
     @Test
     void deleteMessageSetsStatusFlagToDeleted() {
