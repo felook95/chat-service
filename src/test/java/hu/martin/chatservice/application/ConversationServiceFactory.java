@@ -5,15 +5,15 @@ import hu.martin.chatservice.application.port.InMemoryConversationRepository;
 import hu.martin.chatservice.application.port.InMemoryMessageRepository;
 import hu.martin.chatservice.application.port.MessageRepository;
 
-public class ChatServiceFactory {
+public class ConversationServiceFactory {
 
-  public static ChatService withDefaults() {
+  public static ConversationService withDefaults() {
     MessageRepository messageRepository = new InMemoryMessageRepository();
     return withMessageRepository(messageRepository);
   }
 
-  public static ChatService withMessageRepository(MessageRepository messageRepository) {
+  public static ConversationService withMessageRepository(MessageRepository messageRepository) {
     ConversationRepository conversationRepository = new InMemoryConversationRepository();
-    return new DefaultChatService(conversationRepository, messageRepository);
+    return new DefaultConversationService(conversationRepository, messageRepository);
   }
 }

@@ -14,12 +14,12 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DefaultChatService implements ChatService {
+public class DefaultConversationService implements ConversationService {
 
   private final ConversationRepository conversationRepository;
   private final MessageRepository messageRepository;
 
-  public DefaultChatService(ConversationRepository conversationRepository,
+  public DefaultConversationService(ConversationRepository conversationRepository,
       MessageRepository messageRepository) {
     this.conversationRepository = conversationRepository;
     this.messageRepository = messageRepository;

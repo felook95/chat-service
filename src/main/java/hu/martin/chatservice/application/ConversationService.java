@@ -10,7 +10,7 @@ import hu.martin.chatservice.domain.ParticipantId;
 import java.util.Collection;
 import java.util.Set;
 
-public interface ChatService {
+public interface ConversationService {
 
   Conversation startConversation();
 
