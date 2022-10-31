@@ -3,6 +3,7 @@ package hu.martin.chatservice.adapter.in.web.conversation;
 import hu.martin.chatservice.application.ConversationService;
 import hu.martin.chatservice.domain.Conversation;
 import hu.martin.chatservice.domain.ConversationId;
+import hu.martin.chatservice.domain.Message;
 import hu.martin.chatservice.domain.ParticipantId;
 import reactor.core.publisher.Mono;
 
@@ -27,5 +28,12 @@ public class DefaultConversationHandler implements ConversationHandler {
     conversationService.joinParticipantTo(domainConversationId, domainParticipantId);
     Conversation conversation = conversationService.findConversationById(domainConversationId);
     return Mono.just(ConversationDTO.from(conversation));
+  }
+
+  @Override
+  public Mono<MessageDTO> messageSent(Long conversationId, MessageDTO messageDTO) {
+    Message message = messageDTO.asMessage();
+    conversationService.receiveMessage(message);
+    return null;
   }
 }

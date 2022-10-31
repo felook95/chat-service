@@ -8,7 +8,6 @@ public class Message {
   private MessageContent content;
   private MessageStatus statusFlag;
 
-
   public Message(ParticipantId senderId, MessageContent content, CreatedDateTime createdDateTime) {
     this.senderId = senderId;
     this.content = content;

@@ -11,12 +11,18 @@ public class MessageFactory {
     return new Message(participantId, messageContent, createdDateTime);
   }
 
-  public static Message defaultWIthIdOf(Long messageId) {
+  public static Message defaultWIthIdOf(MessageId messageId) {
+    Message message = withDefaults();
+    message.setId(messageId);
+    return message;
+  }
+
+  public static Message withDefaults() {
     ParticipantId participantId = ParticipantId.of(1L);
     MessageContent messageContent = MessageContent.of("");
     CreatedDateTime createdDateTime = CreatedDateTime.of(ZonedDateTime.now());
     Message message = new Message(participantId, messageContent, createdDateTime);
-    message.setId(MessageId.of(messageId));
+    message.setId(MessageId.of(1L));
     return message;
   }
 }

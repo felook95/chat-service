@@ -103,8 +103,8 @@ class ConversationServiceTest {
     MessageContent messageContent = MessageContent.of("Test message");
     CreatedDateTime createdDateTime = CreatedDateTime.of(ZonedDateTime.now().plusNanos(123456));
 
-    MessageId storedMessageId = conversationService.receiveMessage(senderId, messageContent,
-        createdDateTime).id();
+    MessageId storedMessageId = conversationService.receiveMessage(
+        new Message(senderId, messageContent, createdDateTime)).id();
 
     Message foundMessage = conversationService.findMessageById(storedMessageId);
 
@@ -139,7 +139,8 @@ class ConversationServiceTest {
     ParticipantId senderId = ParticipantId.of(1L);
     MessageContent messageContent = MessageContent.of("");
     CreatedDateTime createdDateTime = CreatedDateTime.of(ZonedDateTime.now());
-    return conversationService.receiveMessage(senderId, messageContent, createdDateTime);
+    return conversationService.receiveMessage(
+        new Message(senderId, messageContent, createdDateTime));
   }
 
   @Test
@@ -174,11 +175,10 @@ class ConversationServiceTest {
     conversation.messageSent(MessageId.of(2L));
     conversationRepository.save(conversation);
     MessageRepository messageRepository = new InMemoryMessageRepository();
-    messageRepository.save(MessageFactory.defaultWIthIdOf(1L));
-    messageRepository.save(MessageFactory.defaultWIthIdOf(2L));
+    messageRepository.save(MessageFactory.defaultWIthIdOf(MessageId.of(1L)));
+    messageRepository.save(MessageFactory.defaultWIthIdOf(MessageId.of(2L)));
     ConversationService conversationService = ConversationServiceFactory.with(
-        conversationRepository,
-        messageRepository);
+        conversationRepository, messageRepository);
 
     Set<Message> messagesInConversation = conversationService.messagesFrom(conversation.getId());
 
@@ -212,8 +212,8 @@ class ConversationServiceTest {
     ParticipantId senderId = ParticipantId.of(1L);
     MessageContent messageContent = MessageContent.of("");
     conversationService.joinParticipantTo(conversationId, senderId);
-    MessageId savedMessageId = conversationService.receiveMessage(senderId, messageContent,
-        createdDateTime).id();
+    MessageId savedMessageId = conversationService.receiveMessage(
+        new Message(senderId, messageContent, createdDateTime)).id();
     conversationService.sendMessageTo(savedMessageId, conversationId);
   }
 }

@@ -4,9 +4,7 @@ import hu.martin.chatservice.application.port.ConversationRepository;
 import hu.martin.chatservice.application.port.MessageRepository;
 import hu.martin.chatservice.domain.Conversation;
 import hu.martin.chatservice.domain.ConversationId;
-import hu.martin.chatservice.domain.CreatedDateTime;
 import hu.martin.chatservice.domain.Message;
-import hu.martin.chatservice.domain.MessageContent;
 import hu.martin.chatservice.domain.MessageId;
 import hu.martin.chatservice.domain.ParticipantId;
 import java.util.Collection;
@@ -73,9 +71,8 @@ public class DefaultConversationService implements ConversationService {
   }
 
   @Override
-  public Message receiveMessage(ParticipantId sender, MessageContent messageContent,
-      CreatedDateTime createdDateTime) {
-    return messageRepository.save(new Message(sender, messageContent, createdDateTime));
+  public Message receiveMessage(Message message) {
+    return messageRepository.save(message);
   }
 
   @Override

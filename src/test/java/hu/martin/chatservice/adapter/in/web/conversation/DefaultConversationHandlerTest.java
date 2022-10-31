@@ -9,6 +9,7 @@ import hu.martin.chatservice.domain.Conversation;
 import hu.martin.chatservice.domain.ConversationId;
 import hu.martin.chatservice.domain.MessageId;
 import hu.martin.chatservice.domain.ParticipantId;
+import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
@@ -53,5 +54,20 @@ class DefaultConversationHandlerTest {
     ConversationDTO conversationDTO = conversationMono.block();
     assertThat(conversationDTO.id()).isEqualTo(conversationId.id());
     assertThat(conversationDTO.participantIds()).containsOnly(participantId.id());
+  }
+
+  @Test
+  void sendingMessageToConversationReturnsMessageDTO() {
+    ConversationService conversationService = mock(ConversationService.class);
+    ConversationHandler conversationHandler = new DefaultConversationHandler(conversationService);
+
+    Mono<MessageDTO> messageDTOMono = conversationHandler.messageSent(1L,
+        new MessageDTO(2L, 3L, "Test message", ZonedDateTime.now()));
+
+    MessageDTO messageDTO = messageDTOMono.block();
+    assertThat(messageDTO.id()).isNotNull();
+    assertThat(messageDTO.senderId()).isEqualTo(2L);
+    assertThat(messageDTO.content()).isEqualTo("Test message");
+    assertThat(messageDTO.createdDateTime()).isNotNull();
   }
 }
