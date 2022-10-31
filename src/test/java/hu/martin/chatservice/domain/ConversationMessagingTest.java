@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 @Tag("unitTest")
-public class ConversationMessagingTest {
+class ConversationMessagingTest {
 
   @Test
   void conversationStartsWithoutMessages() {
