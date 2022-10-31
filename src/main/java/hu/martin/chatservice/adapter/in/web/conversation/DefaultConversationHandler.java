@@ -33,7 +33,7 @@ public class DefaultConversationHandler implements ConversationHandler {
   @Override
   public Mono<MessageDTO> messageSent(Long conversationId, MessageDTO messageDTO) {
     Message message = messageDTO.asMessage();
-    conversationService.receiveMessage(message);
-    return null;
+    message = conversationService.receiveMessage(message);
+    return Mono.just(MessageDTO.from(message));
   }
 }

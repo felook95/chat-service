@@ -1,12 +1,14 @@
 package hu.martin.chatservice.adapter.in.web.conversation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import hu.martin.chatservice.application.ConversationService;
 import hu.martin.chatservice.domain.Conversation;
 import hu.martin.chatservice.domain.ConversationId;
+import hu.martin.chatservice.domain.Message;
 import hu.martin.chatservice.domain.MessageId;
 import hu.martin.chatservice.domain.ParticipantId;
 import java.time.ZonedDateTime;
@@ -58,15 +60,18 @@ class DefaultConversationHandlerTest {
 
   @Test
   void sendingMessageToConversationReturnsMessageDTO() {
+    MessageDTO messageDTO1 = new MessageDTO(2L, 3L, "Test message", ZonedDateTime.now());
+    Message message = messageDTO1.asMessage();
     ConversationService conversationService = mock(ConversationService.class);
+    when(conversationService.receiveMessage(any())).thenReturn(message);
     ConversationHandler conversationHandler = new DefaultConversationHandler(conversationService);
 
     Mono<MessageDTO> messageDTOMono = conversationHandler.messageSent(1L,
-        new MessageDTO(2L, 3L, "Test message", ZonedDateTime.now()));
+        messageDTO1);
 
     MessageDTO messageDTO = messageDTOMono.block();
     assertThat(messageDTO.id()).isNotNull();
-    assertThat(messageDTO.senderId()).isEqualTo(2L);
+    assertThat(messageDTO.senderId()).isEqualTo(3L);
     assertThat(messageDTO.content()).isEqualTo("Test message");
     assertThat(messageDTO.createdDateTime()).isNotNull();
   }
