@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class InMemoryConversationRepository implements ConversationRepository {
 
   private final Map<ConversationId, Conversation> conversations = new HashMap<>();
-  private final AtomicLong sequence = new AtomicLong(0);
+  private final AtomicLong sequence = new AtomicLong(1);
 
   @Override
   public Conversation save(Conversation conversation) {

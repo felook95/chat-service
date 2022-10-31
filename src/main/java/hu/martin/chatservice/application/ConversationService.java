@@ -22,7 +22,8 @@ public interface ConversationService {
 
   void sendMessageTo(MessageId messageId, ConversationId conversationId);
 
-  Message receiveMessage(MessageContent messageContent, CreatedDateTime createdDateTime);
+  Message receiveMessage(ParticipantId sender, MessageContent messageContent,
+      CreatedDateTime createdDateTime);
 
   void deleteMessage(MessageId messageId);
 

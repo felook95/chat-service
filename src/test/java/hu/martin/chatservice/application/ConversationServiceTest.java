@@ -3,11 +3,17 @@ package hu.martin.chatservice.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import hu.martin.chatservice.application.port.ConversationRepository;
+import hu.martin.chatservice.application.port.InMemoryConversationRepository;
+import hu.martin.chatservice.application.port.InMemoryMessageRepository;
+import hu.martin.chatservice.application.port.MessageRepository;
 import hu.martin.chatservice.domain.Conversation;
+import hu.martin.chatservice.domain.ConversationFactory;
 import hu.martin.chatservice.domain.ConversationId;
 import hu.martin.chatservice.domain.CreatedDateTime;
 import hu.martin.chatservice.domain.Message;
 import hu.martin.chatservice.domain.MessageContent;
+import hu.martin.chatservice.domain.MessageFactory;
 import hu.martin.chatservice.domain.MessageId;
 import hu.martin.chatservice.domain.MessageStatus;
 import hu.martin.chatservice.domain.ParticipantId;
@@ -64,8 +70,8 @@ class ConversationServiceTest {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
     ConversationId conversationId = ConversationId.of(1L);
 
-    assertThatThrownBy(() -> conversationService.findConversationById(conversationId))
-        .isInstanceOf(ConversationNotFoundException.class);
+    assertThatThrownBy(() -> conversationService.findConversationById(conversationId)).isInstanceOf(
+        ConversationNotFoundException.class);
   }
 
   @Test
@@ -81,25 +87,24 @@ class ConversationServiceTest {
   }
 
   @Test
-  void createMessageWithContentStoresMessage() {
+  void receivedMessageWithContentStoresMessage() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
 
-    Message message = conversationService.receiveMessage(
-        MessageContent.of(""), CreatedDateTime.of(ZonedDateTime.now().plusDays(0))
-    );
+    Message message = receiveDefaultMessage(conversationService);
 
     Message foundMessage = conversationService.findMessageById(message.id());
     assertThat(message).isEqualTo(foundMessage);
   }
 
   @Test
-  void receiveMessageStoresMessage() {
+  void receiveMessageStoresMessageContent() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
+    ParticipantId senderId = ParticipantId.of(1L);
     MessageContent messageContent = MessageContent.of("Test message");
     CreatedDateTime createdDateTime = CreatedDateTime.of(ZonedDateTime.now().plusNanos(123456));
 
-    MessageId storedMessageId = conversationService.receiveMessage(messageContent, createdDateTime)
-        .id();
+    MessageId storedMessageId = conversationService.receiveMessage(senderId, messageContent,
+        createdDateTime).id();
 
     Message foundMessage = conversationService.findMessageById(storedMessageId);
 
@@ -112,16 +117,17 @@ class ConversationServiceTest {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
     MessageId messageId = MessageId.of(1L);
 
-    assertThatThrownBy(() -> conversationService.findMessageById(messageId))
-        .isInstanceOf(MessageNotFoundException.class);
+    assertThatThrownBy(() -> conversationService.findMessageById(messageId)).isInstanceOf(
+        MessageNotFoundException.class);
   }
 
   @Test
   void sentMessageAddingToConversation() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
     Conversation conversation = conversationService.startConversation();
-    Message message = conversationService.receiveMessage(
-        MessageContent.of(""), CreatedDateTime.of(ZonedDateTime.now().plusDays(0)));
+    Message message = receiveDefaultMessage(conversationService);
+    ParticipantId senderId = ParticipantId.of(1L);
+    conversation.joinedBy(senderId);
 
     conversationService.sendMessageTo(message.id(), conversation.getId());
 
@@ -129,13 +135,30 @@ class ConversationServiceTest {
     assertThat(foundConversation.messages()).containsOnly(message.id());
   }
 
+  private static Message receiveDefaultMessage(ConversationService conversationService) {
+    ParticipantId senderId = ParticipantId.of(1L);
+    MessageContent messageContent = MessageContent.of("");
+    CreatedDateTime createdDateTime = CreatedDateTime.of(ZonedDateTime.now());
+    return conversationService.receiveMessage(senderId, messageContent, createdDateTime);
+  }
+
+  @Test
+  void messageSentByNonParticipantThrowsException() {
+    ConversationService conversationService = ConversationServiceFactory.withDefaults();
+    Conversation conversation = conversationService.startConversation();
+    Message message = receiveDefaultMessage(conversationService);
+    MessageId messageId = message.id();
+    ConversationId conversationId = conversation.getId();
+
+    assertThatThrownBy(
+        () -> conversationService.sendMessageTo(messageId, conversationId)).isInstanceOf(
+        IllegalArgumentException.class);
+  }
+
   @Test
   void deletedMessageAppearsInDeletedMessages() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    MessageId messageId = conversationService.receiveMessage(
-        MessageContent.of(""),
-        CreatedDateTime.of(ZonedDateTime.now())
-    ).id();
+    MessageId messageId = receiveDefaultMessage(conversationService).id();
 
     conversationService.deleteMessage(messageId);
 
@@ -145,21 +168,20 @@ class ConversationServiceTest {
 
   @Test
   void messagesForConversationReturnsAllMessages() {
-    ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    ConversationId conversationId = conversationService.startConversation().getId();
+    ConversationRepository conversationRepository = new InMemoryConversationRepository();
+    Conversation conversation = ConversationFactory.withDefaults();
+    conversation.messageSent(MessageId.of(1L));
+    conversation.messageSent(MessageId.of(2L));
+    conversationRepository.save(conversation);
+    MessageRepository messageRepository = new InMemoryMessageRepository();
+    messageRepository.save(MessageFactory.defaultWIthIdOf(1L));
+    messageRepository.save(MessageFactory.defaultWIthIdOf(2L));
+    ConversationService conversationService = ConversationServiceFactory.with(
+        conversationRepository,
+        messageRepository);
 
-    MessageId messageId = conversationService.receiveMessage(
-        MessageContent.of("1"),
-        CreatedDateTime.of(ZonedDateTime.now())
-    ).id();
-    conversationService.sendMessageTo(messageId, conversationId);
-    messageId = conversationService.receiveMessage(
-        MessageContent.of("2"),
-        CreatedDateTime.of(ZonedDateTime.now())
-    ).id();
-    conversationService.sendMessageTo(messageId, conversationId);
+    Set<Message> messagesInConversation = conversationService.messagesFrom(conversation.getId());
 
-    Set<Message> messagesInConversation = conversationService.messagesFrom(conversationId);
     assertThat(messagesInConversation).hasSize(2);
   }
 
@@ -180,17 +202,18 @@ class ConversationServiceTest {
     Collection<Message> orderedMessages = conversationService.messagesByChronologicalOrderFrom(
         conversationId);
 
-    assertThat(orderedMessages)
-        .extracting(Message::createdDateTime)
+    assertThat(orderedMessages).extracting(Message::createdDateTime)
         .containsExactly(mostRecentDateTime, middleDateTime, oldestDateTime);
   }
 
   private void saveRandomMessageToConversationWithCreatedDateTime(
       ConversationService conversationService, CreatedDateTime createdDateTime,
       ConversationId conversationId) {
-    MessageId savedMessageId = conversationService.receiveMessage(MessageContent.of(""),
-            createdDateTime)
-        .id();
+    ParticipantId senderId = ParticipantId.of(1L);
+    MessageContent messageContent = MessageContent.of("");
+    conversationService.joinParticipantTo(conversationId, senderId);
+    MessageId savedMessageId = conversationService.receiveMessage(senderId, messageContent,
+        createdDateTime).id();
     conversationService.sendMessageTo(savedMessageId, conversationId);
   }
 }

@@ -13,7 +13,7 @@ public class InMemoryMessageRepository implements MessageRepository {
 
   private final Map<MessageId, Message> messages = new HashMap<>();
 
-  private final AtomicLong sequence = new AtomicLong();
+  private final AtomicLong sequence = new AtomicLong(1);
 
   @Override
   public Message save(Message message) {

@@ -50,8 +50,19 @@ public class DefaultConversationService implements ConversationService {
   @Override
   public void sendMessageTo(MessageId messageId, ConversationId conversationId) {
     Conversation conversation = findConversationById(conversationId);
+    Message message = findMessageById(messageId);
+    ParticipantId senderId = message.sender();
+    assertConversationHasParticipant(conversation, senderId);
     conversation.messageSent(messageId);
     conversationRepository.save(conversation);
+  }
+
+  private static void assertConversationHasParticipant(Conversation conversation,
+      ParticipantId senderId) {
+    if (conversation.hasParticipant(senderId)) {
+      return;
+    }
+    throw new IllegalArgumentException("Sender is not a participant of the conversation");
   }
 
   @Override
@@ -62,8 +73,9 @@ public class DefaultConversationService implements ConversationService {
   }
 
   @Override
-  public Message receiveMessage(MessageContent messageContent, CreatedDateTime createdDateTime) {
-    return messageRepository.save(new Message(messageContent, createdDateTime));
+  public Message receiveMessage(ParticipantId sender, MessageContent messageContent,
+      CreatedDateTime createdDateTime) {
+    return messageRepository.save(new Message(sender, messageContent, createdDateTime));
   }
 
   @Override

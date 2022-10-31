@@ -4,10 +4,13 @@ public class Message {
 
   private final CreatedDateTime createdDateTime;
   private MessageId id;
+  private final ParticipantId senderId;
   private MessageContent content;
   private MessageStatus statusFlag;
 
-  public Message(MessageContent content, CreatedDateTime createdDateTime) {
+
+  public Message(ParticipantId senderId, MessageContent content, CreatedDateTime createdDateTime) {
+    this.senderId = senderId;
     this.content = content;
     this.statusFlag = MessageStatus.CREATED;
     this.createdDateTime = createdDateTime;
@@ -55,5 +58,9 @@ public class Message {
 
   public void changeStatusFlagTo(MessageStatus newStatusFlag) {
     this.statusFlag = newStatusFlag;
+  }
+
+  public ParticipantId sender() {
+    return senderId;
   }
 }

@@ -5,4 +5,7 @@ import reactor.core.publisher.Mono;
 public interface ConversationHandler {
 
   Mono<ConversationDTO> startConversation();
+
+  Mono<ConversationDTO> joinToConversation(Long conversationId, Long participantId);
+
 }

@@ -16,4 +16,9 @@ public class ConversationServiceFactory {
     ConversationRepository conversationRepository = new InMemoryConversationRepository();
     return new DefaultConversationService(conversationRepository, messageRepository);
   }
+
+  public static ConversationService with(ConversationRepository conversationRepository,
+      MessageRepository messageRepository) {
+    return new DefaultConversationService(conversationRepository, messageRepository);
+  }
 }

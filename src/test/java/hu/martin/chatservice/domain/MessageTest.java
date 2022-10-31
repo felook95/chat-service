@@ -12,17 +12,14 @@ class MessageTest {
 
   @Test
   void newMessageHasDefaultStatusOfNormal() {
-    MessageContent messageContent = MessageContent.of("");
-    CreatedDateTime createdDateTime = CreatedDateTime.of(ZonedDateTime.now());
-
-    Message message = new Message(messageContent, createdDateTime);
+    Message message = MessageFactory.defaultWithContentOf("");
 
     assertThat(message.statusFlag()).isEqualTo(MessageStatus.CREATED);
   }
 
   @Test
   void changeStatusFlagToChangesTheStatusFlag() {
-    Message message = new Message(MessageContent.of(""), CreatedDateTime.of(ZonedDateTime.now()));
+    Message message = MessageFactory.defaultWithContentOf("");
 
     message.changeStatusFlagTo(MessageStatus.DELETED);
 
@@ -31,17 +28,17 @@ class MessageTest {
 
   @Test
   void messageStoresContent() {
+    ParticipantId participantId = ParticipantId.of(1L);
     MessageContent messageContent = new MessageContent("Test message");
-    Message message = new Message(messageContent, CreatedDateTime.of(ZonedDateTime.now()));
+    Message message = new Message(participantId, messageContent,
+        CreatedDateTime.of(ZonedDateTime.now()));
 
     assertThat(message.content()).isEqualTo(messageContent);
   }
 
   @Test
   void editMessageContent() {
-    Message message = new Message(
-        MessageContent.of("Original content"), CreatedDateTime.of(ZonedDateTime.now())
-    );
+    Message message = MessageFactory.defaultWithContentOf("Original content");
     MessageContent modifiedContent = new MessageContent("Modified content");
 
     message.changeContentTo(modifiedContent);
@@ -51,9 +48,7 @@ class MessageTest {
 
   @Test
   void editingMessageContentChangesMessageStatusToEdited() {
-    Message message = new Message(
-        MessageContent.of("Original content"), CreatedDateTime.of(ZonedDateTime.now())
-    );
+    Message message = MessageFactory.defaultWithContentOf("Original content");
 
     message.changeContentTo(MessageContent.of("Modified content"));
 
@@ -62,22 +57,22 @@ class MessageTest {
 
   @Test
   void editingADeletedMessageThrowsException() {
-    Message message = new Message(MessageContent.of("Original content"),
-        CreatedDateTime.of(ZonedDateTime.now()));
+    Message message = MessageFactory.defaultWithContentOf("Original content");
     message.deleted();
 
     MessageContent modifiedContent = MessageContent.of("Modified content");
-    assertThatThrownBy(() -> message.changeContentTo(modifiedContent))
-        .isInstanceOf(IllegalStateException.class);
+    assertThatThrownBy(() -> message.changeContentTo(modifiedContent)).isInstanceOf(
+        IllegalStateException.class);
   }
 
 
   @Test
   void deleteMessageSetsStatusFlagToDeleted() {
-    Message message = new Message(MessageContent.of(""), CreatedDateTime.of(ZonedDateTime.now()));
+    Message message = MessageFactory.defaultWithContentOf("");
 
     message.deleted();
 
     assertThat(message.statusFlag()).isEqualTo(MessageStatus.DELETED);
   }
+
 }
