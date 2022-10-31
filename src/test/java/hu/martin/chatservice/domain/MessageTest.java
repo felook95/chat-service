@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 @Tag("unitTest")
-public class MessageTest {
+class MessageTest {
 
   @Test
   void newMessageHasDefaultStatusOfNormal() {
@@ -66,7 +66,8 @@ public class MessageTest {
         CreatedDateTime.of(ZonedDateTime.now()));
     message.deleted();
 
-    assertThatThrownBy(() -> message.changeContentTo(MessageContent.of("Modified content")))
+    MessageContent modifiedContent = MessageContent.of("Modified content");
+    assertThatThrownBy(() -> message.changeContentTo(modifiedContent))
         .isInstanceOf(IllegalStateException.class);
   }
 

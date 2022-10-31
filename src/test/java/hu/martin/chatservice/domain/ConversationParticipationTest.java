@@ -7,13 +7,13 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 @Tag("unitTest")
-public class ConversationParticipationTest {
+class ConversationParticipationTest {
 
   @Test
   void newConversationHasZeroParticipants() {
     Conversation conversation = new Conversation();
 
-    assertThat(conversation.participants()).hasSize(0);
+    assertThat(conversation.participants()).isEmpty();
   }
 
   @Test

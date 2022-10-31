@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 @Tag("unitTest")
-public class ConversationServiceTest {
+class ConversationServiceTest {
 
   @Test
   void createConversation() {
@@ -53,7 +53,8 @@ public class ConversationServiceTest {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
     Conversation createdConversation = conversationService.startConversation();
 
-    Conversation foundConversation = conversationService.findConversationById(createdConversation.getId());
+    Conversation foundConversation = conversationService.findConversationById(
+        createdConversation.getId());
 
     assertThat(createdConversation).isEqualTo(foundConversation);
   }
@@ -61,8 +62,9 @@ public class ConversationServiceTest {
   @Test
   void notFoundConversationThrowsConversationNotFoundException() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
+    ConversationId conversationId = ConversationId.of(1L);
 
-    assertThatThrownBy(() -> conversationService.findConversationById(ConversationId.of(1L)))
+    assertThatThrownBy(() -> conversationService.findConversationById(conversationId))
         .isInstanceOf(ConversationNotFoundException.class);
   }
 
@@ -96,7 +98,8 @@ public class ConversationServiceTest {
     MessageContent messageContent = MessageContent.of("Test message");
     CreatedDateTime createdDateTime = CreatedDateTime.of(ZonedDateTime.now().plusNanos(123456));
 
-    MessageId storedMessageId = conversationService.receiveMessage(messageContent, createdDateTime).id();
+    MessageId storedMessageId = conversationService.receiveMessage(messageContent, createdDateTime)
+        .id();
 
     Message foundMessage = conversationService.findMessageById(storedMessageId);
 
@@ -107,8 +110,9 @@ public class ConversationServiceTest {
   @Test
   void notFoundMessageThrowsMessageNotFoundException() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
+    MessageId messageId = MessageId.of(1L);
 
-    assertThatThrownBy(() -> conversationService.findMessageById(MessageId.of(1L)))
+    assertThatThrownBy(() -> conversationService.findMessageById(messageId))
         .isInstanceOf(MessageNotFoundException.class);
   }
 
@@ -166,10 +170,12 @@ public class ConversationServiceTest {
     CreatedDateTime oldestDateTime = CreatedDateTime.of(ZonedDateTime.now().plusDays(3));
     CreatedDateTime mostRecentDateTime = CreatedDateTime.of(ZonedDateTime.now().plusDays(0));
     CreatedDateTime middleDateTime = CreatedDateTime.of(ZonedDateTime.now().plusDays(2));
-    saveRandomMessageToConversationWithCreatedDateTime(conversationService, oldestDateTime, conversationId);
+    saveRandomMessageToConversationWithCreatedDateTime(conversationService, oldestDateTime,
+        conversationId);
     saveRandomMessageToConversationWithCreatedDateTime(conversationService, mostRecentDateTime,
         conversationId);
-    saveRandomMessageToConversationWithCreatedDateTime(conversationService, middleDateTime, conversationId);
+    saveRandomMessageToConversationWithCreatedDateTime(conversationService, middleDateTime,
+        conversationId);
 
     Collection<Message> orderedMessages = conversationService.messagesByChronologicalOrderFrom(
         conversationId);
@@ -180,8 +186,10 @@ public class ConversationServiceTest {
   }
 
   private void saveRandomMessageToConversationWithCreatedDateTime(
-      ConversationService conversationService, CreatedDateTime createdDateTime, ConversationId conversationId) {
-    MessageId savedMessageId = conversationService.receiveMessage(MessageContent.of(""), createdDateTime)
+      ConversationService conversationService, CreatedDateTime createdDateTime,
+      ConversationId conversationId) {
+    MessageId savedMessageId = conversationService.receiveMessage(MessageContent.of(""),
+            createdDateTime)
         .id();
     conversationService.sendMessageTo(savedMessageId, conversationId);
   }

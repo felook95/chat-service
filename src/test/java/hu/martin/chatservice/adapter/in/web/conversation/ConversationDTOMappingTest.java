@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 @Tag("unitTest")
-public class ConversationDTOMappingTest {
+class ConversationDTOMappingTest {
 
   @Test
   void DTOToDomainIsMappedCorrectly() {
@@ -37,6 +37,22 @@ public class ConversationDTOMappingTest {
 
     Conversation mappedConversation = conversationDTO.asConversation();
     assertThat(mappedConversation.getId()).isEqualTo(ConversationId.of(1_1L));
+    assertThat(mappedConversation.participants()).containsOnly(ParticipantId.of(2_1L));
+    assertThat(mappedConversation.messages()).containsOnly(MessageId.of(3_1L), MessageId.of(3_2L));
+  }
+
+  @Test
+  void domainToDTOIsMappedCorrectlyWithNullId() {
+    Conversation conversationToTransform = new Conversation();
+    conversationToTransform.setId(null);
+    conversationToTransform.joinedBy(ParticipantId.of(2_1L));
+    conversationToTransform.messageSent(MessageId.of(3_1L));
+    conversationToTransform.messageSent(MessageId.of(3_2L));
+
+    ConversationDTO conversationDTO = ConversationDTO.from(conversationToTransform);
+
+    Conversation mappedConversation = conversationDTO.asConversation();
+    assertThat(mappedConversation.getId()).isNull();
     assertThat(mappedConversation.participants()).containsOnly(ParticipantId.of(2_1L));
     assertThat(mappedConversation.messages()).containsOnly(MessageId.of(3_1L), MessageId.of(3_2L));
   }

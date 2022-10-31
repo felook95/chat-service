@@ -22,6 +22,7 @@ class DefaultConversationHandlerTest {
     when(conversationService.startConversation()).thenReturn(expectedDTO.asConversation());
     ConversationHandler conversationHandler = new DefaultConversationHandler(conversationService);
 
+
     ConversationDTO actualDTO = conversationHandler.startConversation().block();
 
     assertThat(expectedDTO).isEqualTo(actualDTO);
@@ -34,5 +35,4 @@ class DefaultConversationHandlerTest {
     conversation.messageSent(MessageId.of(3_1L));
     return ConversationDTO.from(conversation);
   }
-
 }

@@ -12,7 +12,6 @@ import hu.martin.chatservice.domain.ParticipantId;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class DefaultConversationService implements ConversationService {
 
@@ -71,7 +70,7 @@ public class DefaultConversationService implements ConversationService {
   public Collection<Message> messagesByChronologicalOrderFrom(ConversationId conversationId) {
     return messagesFrom(conversationId).stream()
         .sorted(Comparator.comparing(Message::createdDateTime))
-        .collect(Collectors.toList());
+        .toList();
   }
 
   @Override
