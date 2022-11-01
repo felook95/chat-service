@@ -78,7 +78,7 @@ class DefaultConversationHandlerTest {
     MessageDTO newMessageDTO = new MessageDTO(2L, 3L, "Test message", ZonedDateTime.now());
     Message message = newMessageDTO.asMessage();
     ConversationService conversationService = mock(ConversationService.class);
-    when(conversationService.receiveMessage(any())).thenReturn(message);
+    when(conversationService.receiveAndSendMessageTo(any(), any())).thenReturn(message);
     ConversationHandler conversationHandler = new DefaultConversationHandler(conversationService);
 
     Mono<MessageDTO> messageDTOMono = conversationHandler.messageSent(1L, newMessageDTO);

@@ -47,16 +47,9 @@ public class DefaultConversationHandler implements ConversationHandler {
 
   @Override
   public Mono<MessageDTO> messageSent(Long conversationId, MessageDTO messageDTO) {
-    Message receivedMessage = receiveMessage(messageDTO);
-    sendMessageTo(conversationId, receivedMessage);
+    Message receivedMessage = conversationService.receiveAndSendMessageTo(
+        ConversationId.of(conversationId),
+        messageDTO.asMessage());
     return Mono.just(MessageDTO.from(receivedMessage));
-  }
-
-  private Message receiveMessage(MessageDTO messageDTO) {
-    return conversationService.receiveMessage(messageDTO.asMessage());
-  }
-
-  private void sendMessageTo(Long conversationId, Message receivedMessage) {
-    conversationService.sendMessageTo(receivedMessage.id(), ConversationId.of(conversationId));
   }
 }
