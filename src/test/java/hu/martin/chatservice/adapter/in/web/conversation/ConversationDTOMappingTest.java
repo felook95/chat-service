@@ -56,4 +56,22 @@ class ConversationDTOMappingTest {
     assertThat(mappedConversation.participants()).containsOnly(ParticipantId.of(2_1L));
     assertThat(mappedConversation.messages()).containsOnly(MessageId.of(3_1L), MessageId.of(3_2L));
   }
+
+  @Test
+  void DTOTODomainMappingWithNullMessageIdsMapsToEmptySet() {
+    ConversationDTO conversationDTO = new ConversationDTO(null, null, null);
+
+    Conversation conversation = conversationDTO.asConversation();
+
+    assertThat(conversation.messages()).isEmpty();
+  }
+
+  @Test
+  void DTOTODomainMappingWithNullParticipantIdsMapsToEmptySet() {
+    ConversationDTO conversationDTO = new ConversationDTO(null, null, null);
+
+    Conversation conversation = conversationDTO.asConversation();
+
+    assertThat(conversation.participants()).isEmpty();
+  }
 }

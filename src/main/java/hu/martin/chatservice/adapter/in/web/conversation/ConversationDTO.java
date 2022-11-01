@@ -4,10 +4,17 @@ import hu.martin.chatservice.domain.Conversation;
 import hu.martin.chatservice.domain.ConversationId;
 import hu.martin.chatservice.domain.MessageId;
 import hu.martin.chatservice.domain.ParticipantId;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public record ConversationDTO(Long id, Set<Long> participantIds, Set<Long> messageIds) {
+
+  public ConversationDTO(Long id, Set<Long> participantIds, Set<Long> messageIds) {
+    this.id = id;
+    this.participantIds = participantIds == null ? Collections.emptySet() : participantIds;
+    this.messageIds = messageIds == null ? Collections.emptySet() : messageIds;
+  }
 
   public static ConversationDTO from(Conversation conversation) {
     return new ConversationDTO(conversation.getId() == null ? null : conversation.getId().id(),

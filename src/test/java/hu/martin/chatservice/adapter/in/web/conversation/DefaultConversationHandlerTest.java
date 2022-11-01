@@ -12,6 +12,7 @@ import hu.martin.chatservice.domain.Message;
 import hu.martin.chatservice.domain.MessageId;
 import hu.martin.chatservice.domain.ParticipantId;
 import java.time.ZonedDateTime;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
@@ -40,6 +41,20 @@ class DefaultConversationHandlerTest {
   }
 
   @Test
+  void findConversationByIdReturnsFoundDTO() {
+    ConversationService conversationService = mock(ConversationService.class);
+    ConversationDTO conversationDTOToReturn = conversationDTOAllInitialized();
+    Conversation conversationToReturn = conversationDTOToReturn.asConversation();
+    when(conversationService.findConversationById(ConversationId.of(1L))).thenReturn(
+        conversationToReturn);
+    ConversationHandler conversationHandler = new DefaultConversationHandler(conversationService);
+
+    ConversationDTO conversationDTO = conversationHandler.findConversationById(1L).block();
+
+    assertThat(conversationDTO).isEqualTo(conversationDTOToReturn);
+  }
+
+  @Test
   void joinConversationReturnsADTOWithTheJoinedParticipants() {
     ConversationId conversationId = ConversationId.of(1_1L);
     ParticipantId participantId = ParticipantId.of(2_1L);
@@ -60,13 +75,13 @@ class DefaultConversationHandlerTest {
 
   @Test
   void sendingMessageToConversationReturnsMessageDTO() {
-    MessageDTO messageDTO1 = new MessageDTO(2L, 3L, "Test message", ZonedDateTime.now());
-    Message message = messageDTO1.asMessage();
+    MessageDTO newMessageDTO = new MessageDTO(2L, 3L, "Test message", ZonedDateTime.now());
+    Message message = newMessageDTO.asMessage();
     ConversationService conversationService = mock(ConversationService.class);
     when(conversationService.receiveMessage(any())).thenReturn(message);
     ConversationHandler conversationHandler = new DefaultConversationHandler(conversationService);
 
-    Mono<MessageDTO> messageDTOMono = conversationHandler.messageSent(1L, messageDTO1);
+    Mono<MessageDTO> messageDTOMono = conversationHandler.messageSent(1L, newMessageDTO);
 
     MessageDTO messageDTO = messageDTOMono.block();
     assertThat(messageDTO.id()).isNotNull();
@@ -74,4 +89,31 @@ class DefaultConversationHandlerTest {
     assertThat(messageDTO.content()).isEqualTo("Test message");
     assertThat(messageDTO.createdDateTime()).isNotNull();
   }
+
+  @Test
+  void sendingMessageToConversationAddsMessageToConversation() {
+    ConversationService conversationService = new StubConversationServiceForSendingMessage(
+        ConversationId.of(1L));
+    ConversationHandler conversationHandler = new DefaultConversationHandler(conversationService);
+    MessageDTO newMessageDTO = new MessageDTO(null, 3L, "Test message", ZonedDateTime.now());
+
+    MessageDTO messageDTO = conversationHandler.messageSent(1L, newMessageDTO).block();
+
+    ConversationDTO conversationDTO = conversationHandler.findConversationById(1L).block();
+    assertThat(conversationDTO.messageIds()).containsOnly(messageDTO.id());
+  }
+
+  @Test
+  @Disabled("Needs ConversationService leaving implementation")
+  void leavingConversationResultsInAConversationWithoutTheParticipant() {
+    ConversationService conversationService = new StubConversationServiceForLeaving(
+        ParticipantId.of(1L));
+    ConversationHandler conversationHandler = new DefaultConversationHandler(conversationService);
+
+    conversationHandler.leaveConversation(1L, 1L);
+
+    ConversationDTO conversationDTO = conversationHandler.findConversationById(1L).block();
+    assertThat(conversationDTO.participantIds()).doesNotContain(1L).isEmpty();
+  }
+
 }

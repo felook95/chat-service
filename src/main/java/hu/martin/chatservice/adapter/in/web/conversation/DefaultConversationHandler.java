@@ -31,9 +31,29 @@ public class DefaultConversationHandler implements ConversationHandler {
   }
 
   @Override
+  public void leaveConversation(Long conversationId, Long participantId) {
+    throw new UnsupportedOperationException("Will be implemented later");
+  }
+
+  @Override
+  public Mono<ConversationDTO> findConversationById(Long conversationId) {
+    Conversation conversation = conversationService.findConversationById(
+        ConversationId.of(conversationId));
+    return Mono.just(ConversationDTO.from(conversation));
+  }
+
+  @Override
   public Mono<MessageDTO> messageSent(Long conversationId, MessageDTO messageDTO) {
-    Message message = messageDTO.asMessage();
-    message = conversationService.receiveMessage(message);
-    return Mono.just(MessageDTO.from(message));
+    Message receivedMessage = receiveMessage(messageDTO);
+    sendMessageTo(conversationId, receivedMessage);
+    return Mono.just(MessageDTO.from(receivedMessage));
+  }
+
+  private Message receiveMessage(MessageDTO messageDTO) {
+    return conversationService.receiveMessage(messageDTO.asMessage());
+  }
+
+  private void sendMessageTo(Long conversationId, Message receivedMessage) {
+    conversationService.sendMessageTo(receivedMessage.id(), ConversationId.of(conversationId));
   }
 }
