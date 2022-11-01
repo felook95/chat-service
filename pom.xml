@@ -10,9 +10,9 @@
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <groupId>hu.martin</groupId>
-  <artifactId>chatservice</artifactId>
+  <artifactId>chatter</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>chat-service</name>
+  <name>chatter</name>
   <description>Demo project for Spring Boot</description>
 
   <properties>
