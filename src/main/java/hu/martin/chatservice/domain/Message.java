@@ -35,7 +35,7 @@ public class Message {
     return content;
   }
 
-  public void deleted() {
+  public void delete() {
     statusFlag = MessageStatus.DELETED;
   }
 

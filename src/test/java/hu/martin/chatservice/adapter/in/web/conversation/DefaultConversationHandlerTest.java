@@ -66,8 +66,7 @@ class DefaultConversationHandlerTest {
     when(conversationService.receiveMessage(any())).thenReturn(message);
     ConversationHandler conversationHandler = new DefaultConversationHandler(conversationService);
 
-    Mono<MessageDTO> messageDTOMono = conversationHandler.messageSent(1L,
-        messageDTO1);
+    Mono<MessageDTO> messageDTOMono = conversationHandler.messageSent(1L, messageDTO1);
 
     MessageDTO messageDTO = messageDTOMono.block();
     assertThat(messageDTO.id()).isNotNull();

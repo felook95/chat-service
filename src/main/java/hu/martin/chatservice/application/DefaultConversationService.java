@@ -66,7 +66,7 @@ public class DefaultConversationService implements ConversationService {
   @Override
   public void deleteMessage(MessageId messageId) {
     Message foundMessage = findMessageById(messageId);
-    foundMessage.deleted();
+    foundMessage.delete();
     messageRepository.save(foundMessage);
   }
 

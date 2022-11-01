@@ -58,7 +58,7 @@ class MessageTest {
   @Test
   void editingADeletedMessageThrowsException() {
     Message message = MessageFactory.defaultWithContentOf("Original content");
-    message.deleted();
+    message.delete();
 
     MessageContent modifiedContent = MessageContent.of("Modified content");
     assertThatThrownBy(() -> message.changeContentTo(modifiedContent)).isInstanceOf(
@@ -70,7 +70,7 @@ class MessageTest {
   void deleteMessageSetsStatusFlagToDeleted() {
     Message message = MessageFactory.defaultWithContentOf("");
 
-    message.deleted();
+    message.delete();
 
     assertThat(message.statusFlag()).isEqualTo(MessageStatus.DELETED);
   }
