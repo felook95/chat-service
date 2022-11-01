@@ -39,10 +39,12 @@ public class DefaultConversationService implements ConversationService {
   }
 
   @Override
-  public void joinParticipantTo(ConversationId conversationId, ParticipantId participantId) {
+  public Conversation joinParticipantTo(ConversationId conversationId,
+      ParticipantId participantId) {
     Conversation conversation = findConversationById(conversationId);
     conversation.joinedBy(participantId);
     saveConversation(conversation);
+    return conversation;
   }
 
   @Override
@@ -53,6 +55,13 @@ public class DefaultConversationService implements ConversationService {
     assertConversationHasParticipant(conversation, senderId);
     conversation.messageSent(messageId);
     saveConversation(conversation);
+  }
+
+  @Override
+  public Message receiveAndSendMessageTo(ConversationId conversationId, Message message) {
+    MessageId messageId = receiveMessage(message).id();
+    sendMessageTo(messageId, conversationId);
+    return null;
   }
 
   private static void assertConversationHasParticipant(Conversation conversation,

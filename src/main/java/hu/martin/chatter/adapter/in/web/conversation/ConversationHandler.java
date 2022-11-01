@@ -8,7 +8,7 @@ public interface ConversationHandler {
 
   Mono<ConversationDTO> joinToConversation(Long conversationId, Long participantId);
 
-  void leaveConversation(Long conversationId, Long participantId);
+  void removeFromConversation(Long conversationId, Long participantId);
 
   Mono<MessageDTO> messageSent(Long conversationId, MessageDTO messageDTO);
 

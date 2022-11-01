@@ -62,6 +62,7 @@ class DefaultConversationHandlerTest {
     conversation.setId(conversationId);
     conversation.joinedBy(participantId);
     when(conversationService.findConversationById(conversationId)).thenReturn(conversation);
+    when(conversationService.joinParticipantTo(any(), any())).thenReturn(conversation);
     ConversationHandler conversationHandler = new DefaultConversationHandler(conversationService);
 
     Mono<ConversationDTO> conversationMono = conversationHandler.joinToConversation(
@@ -108,7 +109,7 @@ class DefaultConversationHandlerTest {
         ParticipantId.of(1L));
     ConversationHandler conversationHandler = new DefaultConversationHandler(conversationService);
 
-    conversationHandler.leaveConversation(1L, 1L);
+    conversationHandler.removeFromConversation(1L, 1L);
 
     ConversationDTO conversationDTO = conversationHandler.findConversationById(1L).block();
     assertThat(conversationDTO.participantIds()).doesNotContain(1L).isEmpty();

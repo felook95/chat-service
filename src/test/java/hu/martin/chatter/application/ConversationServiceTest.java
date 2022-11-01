@@ -2,6 +2,9 @@ package hu.martin.chatter.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 import hu.martin.chatter.application.port.ConversationRepository;
 import hu.martin.chatter.application.port.InMemoryConversationRepository;
@@ -133,6 +136,21 @@ class ConversationServiceTest {
 
     Conversation foundConversation = conversationService.findConversationById(conversation.getId());
     assertThat(foundConversation.messages()).containsOnly(message.id());
+  }
+
+  @Test
+  void verifyReceiveAndSendMessageCallsReceiveMessageAndSendMessageTo() {
+    ConversationService conversationService = ConversationServiceFactory.withDefaults();
+    ConversationId conversationId = conversationService.startConversation().getId();
+    ParticipantId participantId = ParticipantId.of(1L);
+    conversationService.joinParticipantTo(conversationId, participantId);
+    conversationService = spy(conversationService);
+    Message message = MessageFactory.defaultWithSender(participantId);
+
+    conversationService.receiveAndSendMessageTo(conversationId, message);
+
+    verify(conversationService).receiveMessage(any());
+    verify(conversationService).sendMessageTo(any(), any());
   }
 
   private static Message receiveDefaultMessage(ConversationService conversationService) {

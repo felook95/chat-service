@@ -34,8 +34,9 @@ public class StubConversationServiceForLeaving implements ConversationService {
   }
 
   @Override
-  public void joinParticipantTo(ConversationId conversationId, ParticipantId participantId) {
+  public Conversation joinParticipantTo(ConversationId conversationId, ParticipantId participantId) {
 
+    return null;
   }
 
   @Override
@@ -46,6 +47,11 @@ public class StubConversationServiceForLeaving implements ConversationService {
   @Override
   public void sendMessageTo(MessageId messageId, ConversationId conversationId) {
 
+  }
+
+  @Override
+  public Message receiveAndSendMessageTo(ConversationId conversationId, Message message) {
+    return null;
   }
 
   @Override

@@ -27,13 +27,13 @@ public class DefaultConversationHandler implements ConversationHandler {
   public Mono<ConversationDTO> joinToConversation(Long conversationId, Long participantId) {
     ConversationId domainConversationId = ConversationId.of(conversationId);
     ParticipantId domainParticipantId = ParticipantId.of(participantId);
-    conversationService.joinParticipantTo(domainConversationId, domainParticipantId);
-    Conversation conversation = conversationService.findConversationById(domainConversationId);
+    Conversation conversation = conversationService.joinParticipantTo(domainConversationId,
+        domainParticipantId);
     return Mono.just(ConversationDTO.from(conversation));
   }
 
   @Override
-  public void leaveConversation(Long conversationId, Long participantId) {
+  public void removeFromConversation(Long conversationId, Long participantId) {
     conversationService.removeFromConversation(ConversationId.of(conversationId),
         ParticipantId.of(participantId));
   }

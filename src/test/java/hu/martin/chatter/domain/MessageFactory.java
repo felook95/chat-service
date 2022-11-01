@@ -19,6 +19,10 @@ public class MessageFactory {
 
   public static Message withDefaults() {
     ParticipantId participantId = ParticipantId.of(1L);
+    return defaultWithSender(participantId);
+  }
+
+  public static Message defaultWithSender(ParticipantId participantId) {
     MessageContent messageContent = MessageContent.of("");
     CreatedDateTime createdDateTime = CreatedDateTime.of(ZonedDateTime.now());
     Message message = new Message(participantId, messageContent, createdDateTime);

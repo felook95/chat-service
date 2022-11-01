@@ -34,8 +34,9 @@ public class StubConversationServiceForSendingMessage implements ConversationSer
   }
 
   @Override
-  public void joinParticipantTo(ConversationId conversationId, ParticipantId participantId) {
+  public Conversation joinParticipantTo(ConversationId conversationId, ParticipantId participantId) {
 
+    return null;
   }
 
   @Override
@@ -47,6 +48,11 @@ public class StubConversationServiceForSendingMessage implements ConversationSer
   @Override
   public void sendMessageTo(MessageId messageId, ConversationId conversationId) {
     conversation.messageSent(messageId);
+  }
+
+  @Override
+  public Message receiveAndSendMessageTo(ConversationId conversationId, Message message) {
+    return null;
   }
 
   @Override

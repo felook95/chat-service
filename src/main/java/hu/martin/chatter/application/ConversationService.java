@@ -16,11 +16,13 @@ public interface ConversationService {
 
   Message findMessageById(MessageId id);
 
-  void joinParticipantTo(ConversationId conversationId, ParticipantId participantId);
+  Conversation joinParticipantTo(ConversationId conversationId, ParticipantId participantId);
 
   Message receiveMessage(Message message);
 
   void sendMessageTo(MessageId messageId, ConversationId conversationId);
+
+  Message receiveAndSendMessageTo(ConversationId conversationId, Message message);
 
   void deleteMessage(MessageId messageId);
 
