@@ -32,7 +32,8 @@ public class DefaultConversationHandler implements ConversationHandler {
 
   @Override
   public void leaveConversation(Long conversationId, Long participantId) {
-    throw new UnsupportedOperationException("Will be implemented later");
+    conversationService.removeFromConversation(ConversationId.of(conversationId),
+        ParticipantId.of(participantId));
   }
 
   @Override

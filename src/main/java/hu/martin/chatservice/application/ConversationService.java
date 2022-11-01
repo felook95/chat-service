@@ -27,4 +27,6 @@ public interface ConversationService {
   Set<Message> messagesFrom(ConversationId conversationId);
 
   Collection<Message> messagesByChronologicalOrderFrom(ConversationId conversationId);
+
+  void removeFromConversation(ConversationId conversationId, ParticipantId participantId);
 }

@@ -12,7 +12,6 @@ import hu.martin.chatservice.domain.Message;
 import hu.martin.chatservice.domain.MessageId;
 import hu.martin.chatservice.domain.ParticipantId;
 import java.time.ZonedDateTime;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
@@ -104,7 +103,6 @@ class DefaultConversationHandlerTest {
   }
 
   @Test
-  @Disabled("Needs ConversationService leaving implementation")
   void leavingConversationResultsInAConversationWithoutTheParticipant() {
     ConversationService conversationService = new StubConversationServiceForLeaving(
         ParticipantId.of(1L));

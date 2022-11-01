@@ -25,7 +25,7 @@ public class DefaultConversationService implements ConversationService {
   @Override
   public Conversation startConversation() {
     Conversation conversation = new Conversation();
-    return conversationRepository.save(conversation);
+    return saveConversation(conversation);
   }
 
   @Override
@@ -42,7 +42,7 @@ public class DefaultConversationService implements ConversationService {
   public void joinParticipantTo(ConversationId conversationId, ParticipantId participantId) {
     Conversation conversation = findConversationById(conversationId);
     conversation.joinedBy(participantId);
-    conversationRepository.save(conversation);
+    saveConversation(conversation);
   }
 
   @Override
@@ -52,7 +52,7 @@ public class DefaultConversationService implements ConversationService {
     ParticipantId senderId = message.sender();
     assertConversationHasParticipant(conversation, senderId);
     conversation.messageSent(messageId);
-    conversationRepository.save(conversation);
+    saveConversation(conversation);
   }
 
   private static void assertConversationHasParticipant(Conversation conversation,
@@ -80,6 +80,17 @@ public class DefaultConversationService implements ConversationService {
     return messagesFrom(conversationId).stream()
         .sorted(Comparator.comparing(Message::createdDateTime))
         .toList();
+  }
+
+  @Override
+  public void removeFromConversation(ConversationId conversationId, ParticipantId participantId) {
+    Conversation conversation = findConversationById(conversationId);
+    conversation.leftBy(participantId);
+    saveConversation(conversation);
+  }
+
+  private Conversation saveConversation(Conversation conversation) {
+    return conversationRepository.save(conversation);
   }
 
   @Override

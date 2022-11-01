@@ -25,7 +25,7 @@ public class StubConversationServiceForLeaving implements ConversationService {
 
   @Override
   public Conversation findConversationById(ConversationId id) {
-    return null;
+    return conversation;
   }
 
   @Override
@@ -61,5 +61,10 @@ public class StubConversationServiceForLeaving implements ConversationService {
   @Override
   public Collection<Message> messagesByChronologicalOrderFrom(ConversationId conversationId) {
     return null;
+  }
+
+  @Override
+  public void removeFromConversation(ConversationId conversationId, ParticipantId participantId) {
+    conversation.leftBy(participantId);
   }
 }

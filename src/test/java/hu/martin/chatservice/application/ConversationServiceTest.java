@@ -216,4 +216,27 @@ class ConversationServiceTest {
         new Message(senderId, messageContent, createdDateTime)).id();
     conversationService.sendMessageTo(savedMessageId, conversationId);
   }
+
+  @Test
+  void leavingConversationRemovesParticipantFromConversation() {
+    ConversationId conversationId = ConversationId.of(1L);
+    ParticipantId participantId = ParticipantId.of(1L);
+    ConversationService conversationService = conversationServiceWithParticipantInConversation(
+        conversationId, participantId);
+
+    conversationService.removeFromConversation(conversationId, participantId);
+
+    Conversation conversation = conversationService.findConversationById(conversationId);
+    assertThat(conversation.hasParticipant(participantId)).isFalse();
+
+  }
+
+  private static ConversationService conversationServiceWithParticipantInConversation(
+      ConversationId conversationId, ParticipantId participantId) {
+    ConversationRepository conversationRepository = new InMemoryConversationRepository();
+    Conversation conversation = ConversationFactory.withParticipants(participantId);
+    conversation.setId(conversationId);
+    conversationRepository.save(conversation);
+    return ConversationServiceFactory.withConversationRepository(conversationRepository);
+  }
 }

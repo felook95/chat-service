@@ -63,4 +63,9 @@ public class StubConversationServiceForSendingMessage implements ConversationSer
   public Collection<Message> messagesByChronologicalOrderFrom(ConversationId conversationId) {
     return null;
   }
+
+  @Override
+  public void removeFromConversation(ConversationId conversationId, ParticipantId participantId) {
+
+  }
 }
