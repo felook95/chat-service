@@ -6,6 +6,8 @@ import hu.martin.chatter.domain.ConversationId;
 import hu.martin.chatter.domain.Message;
 import hu.martin.chatter.domain.ParticipantId;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -18,18 +20,22 @@ public class DefaultConversationHandler implements ConversationHandler {
   }
 
   @Override
-  public Mono<ConversationDTO> startConversation() {
+  public Mono<ServerResponse> startConversation(ServerRequest serverRequest) {
     Conversation conversation = conversationService.startConversation();
-    return Mono.just(ConversationDTO.from(conversation));
+    Mono<ConversationDTO> conversationDTOMono = Mono.just(ConversationDTO.from(conversation));
+    return ServerResponse.ok().body(conversationDTOMono, ConversationDTO.class);
   }
 
   @Override
-  public Mono<ConversationDTO> joinToConversation(Long conversationId, Long participantId) {
+  public Mono<ServerResponse> joinToConversation(ServerRequest serverRequest) {
+    Long conversationId = Long.valueOf(serverRequest.pathVariable("conversationId"));
+    Long participantId = Long.valueOf(serverRequest.pathVariable("participantId"));
     ConversationId domainConversationId = ConversationId.of(conversationId);
     ParticipantId domainParticipantId = ParticipantId.of(participantId);
     Conversation conversation = conversationService.joinParticipantTo(domainConversationId,
         domainParticipantId);
-    return Mono.just(ConversationDTO.from(conversation));
+    Mono<ConversationDTO> just = Mono.just(ConversationDTO.from(conversation));
+    return ServerResponse.ok().body(just, ConversationDTO.class);
   }
 
   @Override
@@ -39,10 +45,12 @@ public class DefaultConversationHandler implements ConversationHandler {
   }
 
   @Override
-  public Mono<ConversationDTO> findConversationById(Long conversationId) {
+  public Mono<ServerResponse> findConversationById(ServerRequest serverRequest) {
+    Long conversationId = Long.valueOf(serverRequest.pathVariable("id"));
     Conversation conversation = conversationService.findConversationById(
         ConversationId.of(conversationId));
-    return Mono.just(ConversationDTO.from(conversation));
+    return ServerResponse.ok()
+        .body(Mono.just(ConversationDTO.from(conversation)), ConversationDTO.class);
   }
 
   @Override
