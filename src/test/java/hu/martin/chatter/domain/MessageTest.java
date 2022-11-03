@@ -12,14 +12,14 @@ class MessageTest {
 
   @Test
   void newMessageHasDefaultStatusOfNormal() {
-    Message message = MessageFactory.defaultWithContentOf("");
+    Message message = MessageFactory.withDefaults();
 
     assertThat(message.statusFlag()).isEqualTo(MessageStatus.CREATED);
   }
 
   @Test
   void changeStatusFlagToChangesTheStatusFlag() {
-    Message message = MessageFactory.defaultWithContentOf("");
+    Message message = MessageFactory.withDefaults();
 
     message.changeStatusFlagTo(MessageStatus.DELETED);
 
@@ -38,17 +38,17 @@ class MessageTest {
 
   @Test
   void editMessageContent() {
-    Message message = MessageFactory.defaultWithContentOf("Original content");
-    MessageContent modifiedContent = new MessageContent("Modified content");
+    Message message = MessageFactory.withDefaults();
+    MessageContent newContent = MessageContent.of("Modified content");
 
-    message.changeContentTo(modifiedContent);
+    message.changeContentTo(newContent);
 
-    assertThat(message.content()).isEqualTo(modifiedContent);
+    assertThat(message.content()).isEqualTo(newContent);
   }
 
   @Test
   void editingMessageContentChangesMessageStatusToEdited() {
-    Message message = MessageFactory.defaultWithContentOf("Original content");
+    Message message = MessageFactory.withDefaults();
 
     message.changeContentTo(MessageContent.of("Modified content"));
 
@@ -57,7 +57,7 @@ class MessageTest {
 
   @Test
   void editingADeletedMessageThrowsException() {
-    Message message = MessageFactory.defaultWithContentOf("Original content");
+    Message message = MessageFactory.withDefaults();
     message.delete();
 
     MessageContent modifiedContent = MessageContent.of("Modified content");
@@ -68,7 +68,7 @@ class MessageTest {
 
   @Test
   void deleteMessageSetsStatusFlagToDeleted() {
-    Message message = MessageFactory.defaultWithContentOf("");
+    Message message = MessageFactory.withDefaults();
 
     message.delete();
 
