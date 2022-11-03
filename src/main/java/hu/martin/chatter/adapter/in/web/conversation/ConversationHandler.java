@@ -10,9 +10,11 @@ public interface ConversationHandler {
 
   Mono<ServerResponse> joinToConversation(ServerRequest serverRequest);
 
-  void removeFromConversation(Long conversationId, Long participantId);
+  Mono<ServerResponse> removeFromConversation(ServerRequest serverRequest);
 
-  Mono<MessageDTO> messageSent(Long conversationId, MessageDTO messageDTO);
+  Mono<ServerResponse> messageSent(ServerRequest serverRequest);
 
   Mono<ServerResponse> findConversationById(ServerRequest serverRequest);
+
+  Mono<ServerResponse> messagesFromConversation(ServerRequest serverRequest);
 }

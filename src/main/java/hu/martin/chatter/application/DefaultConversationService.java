@@ -59,9 +59,10 @@ public class DefaultConversationService implements ConversationService {
 
   @Override
   public Message receiveAndSendMessageTo(ConversationId conversationId, Message message) {
-    MessageId messageId = receiveMessage(message).id();
+    Message receivedMessage = receiveMessage(message);
+    MessageId messageId = receivedMessage.id();
     sendMessageTo(messageId, conversationId);
-    return null;
+    return receivedMessage;
   }
 
   private static void assertConversationHasParticipant(Conversation conversation,

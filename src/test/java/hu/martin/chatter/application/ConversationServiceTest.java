@@ -153,6 +153,21 @@ class ConversationServiceTest {
     verify(conversationService).sendMessageTo(any(), any());
   }
 
+  @Test
+  void receiveAndSendMessageReturnsSavedMessage() {
+    ConversationService conversationService = ConversationServiceFactory.withDefaults();
+    ConversationId conversationId = conversationService.startConversation().getId();
+    ParticipantId participantId = ParticipantId.of(1L);
+    conversationService.joinParticipantTo(conversationId, participantId);
+    Message message = MessageFactory.defaultWithSender(participantId);
+    message.setId(null);
+
+    Message savedMessage = conversationService.receiveAndSendMessageTo(conversationId, message);
+
+    assertThat(savedMessage).isNotNull();
+    assertThat(savedMessage.id()).isNotNull();
+  }
+
   private static Message receiveDefaultMessage(ConversationService conversationService) {
     ParticipantId senderId = ParticipantId.of(1L);
     MessageContent messageContent = MessageContent.of("");

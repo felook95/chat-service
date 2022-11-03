@@ -15,10 +15,14 @@ public class ConversationRouter {
   @Bean
   RouterFunction<ServerResponse> conversationRoute(ConversationHandler conversationHandler) {
     RouterFunction<ServerResponse> conversationRoute = route()
-        .GET("/{id}", conversationHandler::findConversationById)
+        .GET("/{conversationId}/messages", conversationHandler::messagesFromConversation)
+        .GET("/{conversationId}", conversationHandler::findConversationById)
+        .POST("/{conversationId}/messages", conversationHandler::messageSent)
         .POST("/{conversationId}/participants/{participantId}",
             conversationHandler::joinToConversation)
         .POST(conversationHandler::startConversation)
+        .DELETE("/{conversationId}/participants/{participantId}",
+            conversationHandler::removeFromConversation)
         .build();
     return nest(path("/conversation"), conversationRoute);
   }
