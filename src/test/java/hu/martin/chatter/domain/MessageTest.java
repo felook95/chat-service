@@ -3,7 +3,7 @@ package hu.martin.chatter.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +31,7 @@ class MessageTest {
     ParticipantId participantId = ParticipantId.of(1L);
     MessageContent messageContent = new MessageContent("Test message");
     Message message = new Message(participantId, messageContent,
-        CreatedDateTime.of(ZonedDateTime.now()));
+        CreatedDateTime.of(LocalDateTime.now()));
 
     assertThat(message.content()).isEqualTo(messageContent);
   }

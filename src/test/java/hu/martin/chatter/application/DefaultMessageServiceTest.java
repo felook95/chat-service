@@ -25,7 +25,7 @@ class DefaultMessageServiceTest {
       assertThat(savedMessage.sender()).isEqualTo(messageToReceive.sender());
       assertThat(savedMessage.content()).isEqualTo(messageToReceive.content());
       assertThat(savedMessage.statusFlag()).isEqualTo(messageToReceive.statusFlag());
-    });
+    }).expectComplete().verify();
   }
 
   @Test
@@ -39,7 +39,8 @@ class DefaultMessageServiceTest {
         savedMessage -> messageService.editMessageContent(savedMessage.id(), newContent));
 
     StepVerifier.create(editedMessageMono).consumeNextWith(
-        editedMessage -> assertThat(editedMessage.content()).isEqualTo(newContent));
+            editedMessage -> assertThat(editedMessage.content()).isEqualTo(newContent)).expectComplete()
+        .verify();
 
   }
 }

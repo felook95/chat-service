@@ -12,7 +12,7 @@ import hu.martin.chatter.domain.CreatedDateTime;
 import hu.martin.chatter.domain.Message;
 import hu.martin.chatter.domain.MessageFactory;
 import hu.martin.chatter.domain.ParticipantId;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -74,7 +74,7 @@ class ConversationRouterTest {
   @Test
   void sendingMessageToConversationReturnsMessageDTO() {
     Message message = MessageFactory.defaultWIthCreatedDateTimeOf(
-        CreatedDateTime.of(ZonedDateTime.parse("2022-11-03T18:27:40.005661434Z")));
+        CreatedDateTime.of(LocalDateTime.parse("2022-11-03T18:27:40.005661434")));
     when(conversationService.receiveAndSendMessageTo(any(), any())).thenReturn(Mono.just(message));
     MessageDTO messageDTO = MessageDTO.from(message);
 
@@ -84,7 +84,7 @@ class ConversationRouterTest {
                "id":1,
                "senderId":1,
                "content":"",
-               "createdDateTime":"2022-11-03T18:27:40.005661434Z"
+               "createdDateTime":"2022-11-03T18:27:40.005661434"
             }
             """);
   }
@@ -92,13 +92,13 @@ class ConversationRouterTest {
   @Test
   void storedMessagesCanBeRetrievedFromConversation() {
     CreatedDateTime createdDateTime = CreatedDateTime.of(
-        ZonedDateTime.parse("2022-11-03T18:38:20.005661434Z"));
+        LocalDateTime.parse("2022-11-03T18:38:20.005661434"));
     Message message = MessageFactory.defaultWIthCreatedDateTimeOf(createdDateTime);
     when(conversationService.messagesFrom(any())).thenReturn(Flux.just(message));
 
     client.get().uri("/conversation/1/messages").exchange().expectBody()
         .json("""
-            [{"senderId":1,"content":"","createdDateTime":"2022-11-03T18:38:20.005661434Z"}]
+            [{"senderId":1,"content":"","createdDateTime":"2022-11-03T18:38:20.005661434"}]
             """);
   }
 

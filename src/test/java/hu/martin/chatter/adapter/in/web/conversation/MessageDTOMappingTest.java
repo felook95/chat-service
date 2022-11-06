@@ -7,8 +7,9 @@ import hu.martin.chatter.domain.Message;
 import hu.martin.chatter.domain.MessageContent;
 import hu.martin.chatter.domain.MessageFactory;
 import hu.martin.chatter.domain.MessageId;
+import hu.martin.chatter.domain.MessageStatus;
 import hu.martin.chatter.domain.ParticipantId;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -20,33 +21,32 @@ class MessageDTOMappingTest {
     MessageId messageId = MessageId.of(1L);
     ParticipantId sender = ParticipantId.of(1L);
     MessageContent messageContent = MessageContent.of("Test message");
-    CreatedDateTime createdDateTime = CreatedDateTime.of(ZonedDateTime.now().plusNanos(12345L));
+    CreatedDateTime createdDateTime = CreatedDateTime.of(LocalDateTime.now().plusNanos(12345L));
     Message message = new Message(sender, messageContent, createdDateTime);
     message.setId(messageId);
+    message.changeStatusFlagTo(MessageStatus.DELETED);
 
     MessageDTO messageDTO = MessageDTO.from(message);
 
     assertThat(messageDTO.id()).isEqualTo(messageId.id());
-    assertThat(messageDTO.senderId()).isEqualTo(sender.id());
-    assertThat(messageDTO.content()).isEqualTo(messageContent.content());
-    assertThat(messageDTO.createdDateTime()).isEqualTo(createdDateTime.createdDateTime());
+    assertMappedCorrectly(messageDTO, message);
   }
 
   @Test
   void domainToDTOIsMappedCorrectlyWithNullId() {
     Message message = MessageFactory.defaultWIthIdOf(null);
+    message.changeStatusFlagTo(MessageStatus.DELETED);
 
     MessageDTO messageDTO = MessageDTO.from(message);
 
     assertThat(messageDTO.id()).isNull();
-    assertThat(messageDTO.senderId()).isEqualTo(message.sender().id());
-    assertThat(messageDTO.content()).isEqualTo(message.content().content());
-    assertThat(messageDTO.createdDateTime()).isEqualTo(message.createdDateTime().createdDateTime());
+    assertMappedCorrectly(messageDTO, message);
   }
 
   @Test
   void DTOToDomainIsMappedCorrectly() {
-    MessageDTO messageDTO = MessageDTO.from(MessageFactory.withDefaults());
+    MessageDTO messageDTO = MessageDTO.from(
+        MessageFactory.defaultsWithStatusFlag(MessageStatus.DELETED));
 
     Message message = messageDTO.asMessage();
 
@@ -56,7 +56,8 @@ class MessageDTOMappingTest {
 
   @Test
   void DTOTODomainIsMappedCorrectlyWithNullId() {
-    MessageDTO messageDTO = MessageDTO.from(MessageFactory.defaultWIthIdOf(null));
+    MessageDTO messageDTO = MessageDTO.from(
+        MessageFactory.defaultWIthIdAndStatusFlag(null, MessageStatus.DELETED));
 
     Message message = messageDTO.asMessage();
 
@@ -67,6 +68,7 @@ class MessageDTOMappingTest {
   private static void assertMappedCorrectly(MessageDTO messageDTO, Message message) {
     assertThat(message.sender()).isEqualTo(ParticipantId.of(messageDTO.senderId()));
     assertThat(message.content()).isEqualTo(MessageContent.of(messageDTO.content()));
+    assertThat(message.statusFlag()).isEqualTo(MessageStatus.valueOf(messageDTO.statusFlag()));
     assertThat(message.createdDateTime()).isEqualTo(
         CreatedDateTime.of(messageDTO.createdDateTime()));
   }

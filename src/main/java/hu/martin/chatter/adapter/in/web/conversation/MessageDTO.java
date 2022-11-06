@@ -4,16 +4,19 @@ import hu.martin.chatter.domain.CreatedDateTime;
 import hu.martin.chatter.domain.Message;
 import hu.martin.chatter.domain.MessageContent;
 import hu.martin.chatter.domain.MessageId;
+import hu.martin.chatter.domain.MessageStatus;
 import hu.martin.chatter.domain.ParticipantId;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
-public record MessageDTO(Long id, Long senderId, String content, ZonedDateTime createdDateTime) {
+public record MessageDTO(Long id, Long senderId, String content, String statusFlag,
+                         LocalDateTime createdDateTime) {
 
   public static MessageDTO from(Message message) {
     return new MessageDTO(
         message.id() == null ? null : message.id().id(),
         message.sender().id(),
         message.content().content(),
+        message.statusFlag().name(),
         message.createdDateTime().createdDateTime());
   }
 
@@ -23,6 +26,7 @@ public record MessageDTO(Long id, Long senderId, String content, ZonedDateTime c
         MessageContent.of(content),
         CreatedDateTime.of(createdDateTime)
     );
+    message.changeStatusFlagTo(MessageStatus.valueOf(statusFlag));
     if (id != null) {
       message.setId(MessageId.of(id));
     }

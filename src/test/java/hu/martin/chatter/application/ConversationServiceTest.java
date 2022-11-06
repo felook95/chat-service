@@ -20,7 +20,7 @@ import hu.martin.chatter.domain.MessageFactory;
 import hu.martin.chatter.domain.MessageId;
 import hu.martin.chatter.domain.MessageStatus;
 import hu.martin.chatter.domain.ParticipantId;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -106,7 +106,7 @@ class ConversationServiceTest {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
     ParticipantId senderId = ParticipantId.of(1L);
     MessageContent messageContent = MessageContent.of("Test message");
-    CreatedDateTime createdDateTime = CreatedDateTime.of(ZonedDateTime.now().plusNanos(123456));
+    CreatedDateTime createdDateTime = CreatedDateTime.of(LocalDateTime.now().plusNanos(123456));
 
     MessageId storedMessageId = conversationService.receiveMessage(
         new Message(senderId, messageContent, createdDateTime)).block().id();
@@ -176,7 +176,7 @@ class ConversationServiceTest {
   private static Message receiveDefaultMessage(ConversationService conversationService) {
     ParticipantId senderId = ParticipantId.of(1L);
     MessageContent messageContent = MessageContent.of("");
-    CreatedDateTime createdDateTime = CreatedDateTime.of(ZonedDateTime.now());
+    CreatedDateTime createdDateTime = CreatedDateTime.of(LocalDateTime.now());
     return conversationService.receiveMessage(
         new Message(senderId, messageContent, createdDateTime)).block();
   }
@@ -229,9 +229,9 @@ class ConversationServiceTest {
   void conversationReturnsMessagesInChronologicalOrder() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
     ConversationId conversationId = conversationService.startConversation().block().getId();
-    CreatedDateTime oldestDateTime = CreatedDateTime.of(ZonedDateTime.now().plusDays(3));
-    CreatedDateTime mostRecentDateTime = CreatedDateTime.of(ZonedDateTime.now().plusDays(0));
-    CreatedDateTime middleDateTime = CreatedDateTime.of(ZonedDateTime.now().plusDays(2));
+    CreatedDateTime oldestDateTime = CreatedDateTime.of(LocalDateTime.now().plusDays(3));
+    CreatedDateTime mostRecentDateTime = CreatedDateTime.of(LocalDateTime.now().plusDays(0));
+    CreatedDateTime middleDateTime = CreatedDateTime.of(LocalDateTime.now().plusDays(2));
     saveRandomMessageToConversationWithCreatedDateTime(conversationService, oldestDateTime,
         conversationId);
     saveRandomMessageToConversationWithCreatedDateTime(conversationService, mostRecentDateTime,

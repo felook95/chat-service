@@ -1,11 +1,11 @@
 package hu.martin.chatter.domain;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
-public record CreatedDateTime(ZonedDateTime createdDateTime) implements
+public record CreatedDateTime(LocalDateTime createdDateTime) implements
     Comparable<CreatedDateTime> {
 
-  public static CreatedDateTime of(ZonedDateTime createdDateTime) {
+  public static CreatedDateTime of(LocalDateTime createdDateTime) {
     return new CreatedDateTime(createdDateTime);
   }
 
