@@ -23,6 +23,6 @@ public class InMemoryConversationRepository implements ConversationRepository {
 
   @Override
   public Mono<Conversation> findById(ConversationId id) {
-    return Mono.just(conversations.get(id));
+    return Mono.justOrEmpty(conversations.get(id));
   }
 }

@@ -27,7 +27,7 @@ public class InMemoryMessageRepository implements MessageRepository {
 
   @Override
   public Mono<Message> findById(MessageId messageId) {
-    return Mono.just(messages.get(messageId));
+    return Mono.justOrEmpty(messages.get(messageId));
   }
 
   @Override

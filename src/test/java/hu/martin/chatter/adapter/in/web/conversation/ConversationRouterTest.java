@@ -104,6 +104,8 @@ class ConversationRouterTest {
 
   @Test
   void verifyCallToRemoveFromConversationIsCalledOnParticipantDelete() {
+    when(conversationService.removeFromConversation(any(),any())).thenReturn(Mono.empty());
+
     client.delete()
         .uri("/conversation/1/participants/1")
         .exchange().expectStatus().isOk();

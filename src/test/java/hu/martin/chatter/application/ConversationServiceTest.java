@@ -22,12 +22,9 @@ import hu.martin.chatter.domain.MessageStatus;
 import hu.martin.chatter.domain.ParticipantId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
-import java.util.Set;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
-import reactor.util.function.Tuple2;
 
 @Tag("unitTest")
 class ConversationServiceTest {
@@ -36,52 +33,39 @@ class ConversationServiceTest {
   void createConversation() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
 
-    Mono<Conversation> conversationMono = conversationService.startConversation();
+    Conversation conversation = conversationService.startConversation().block();
 
-    StepVerifier.create(conversationMono)
-        .consumeNextWith(conversation -> assertThat(conversation).isNotNull());
-
+    assertThat(conversation).isNotNull();
   }
 
   @Test
   void createConversationReturnsConversationWithId() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
 
-    Mono<Conversation> conversationMono = conversationService.startConversation();
+    Conversation conversation = conversationService.startConversation().block();
 
-    StepVerifier.create(conversationMono)
-        .consumeNextWith(conversation -> assertThat(conversation.getId()).isNotNull());
+    assertThat(conversation.getId()).isNotNull();
   }
 
   @Test
   void multipleCreateConversationCallReturnsConversationsWithDifferentId() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
 
-    Mono<Conversation> conversationMono1 = conversationService.startConversation();
-    Mono<Conversation> conversationMono2 = conversationService.startConversation();
-    Mono<Tuple2<Conversation, Conversation>> zip = Mono.zip(conversationMono1, conversationMono2);
+    Conversation conversation1 = conversationService.startConversation().block();
+    Conversation conversation2 = conversationService.startConversation().block();
 
-    StepVerifier.create(zip).consumeNextWith(objects -> {
-      Conversation conversation1 = objects.getT1();
-      Conversation conversation2 = objects.getT2();
-      assertThat(conversation1.getId()).isNotEqualTo(conversation2.getId());
-    });
+    assertThat(conversation1.getId()).isNotEqualTo(conversation2.getId());
   }
 
   @Test
   void conversationServiceFindsCreatedConversation() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    Mono<Conversation> createdConversationMono = conversationService.startConversation();
+    Conversation createdConversation = conversationService.startConversation().block();
 
-    Mono<Tuple2<Conversation, Conversation>> tuple2Mono = createdConversationMono.flatMap(
-        createdConversation -> conversationService.findConversationById(createdConversation.getId())
-            .zipWith(Mono.just(createdConversation)));
+    Conversation foundConversation = conversationService.findConversationById(
+        createdConversation.getId()).block();
 
-    StepVerifier.create(tuple2Mono).consumeNextWith(objects -> {
-      Conversation foundConversation = objects.getT1();
-      Conversation createdConversation = objects.getT2();
-      assertThat(createdConversation).isEqualTo(foundConversation);
-    });
+    assertThat(createdConversation).isEqualTo(foundConversation);
   }
 
   @Test
@@ -89,19 +73,21 @@ class ConversationServiceTest {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
     ConversationId conversationId = ConversationId.of(1L);
 
-    assertThatThrownBy(() -> conversationService.findConversationById(conversationId)).isInstanceOf(
+    Mono<Conversation> conversationByIdMono = conversationService.findConversationById(conversationId);
+    assertThatThrownBy(conversationByIdMono::block).isInstanceOf(
         ConversationNotFoundException.class);
   }
 
   @Test
   void joinParticipantAddsParticipantToConversation() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    Conversation conversation = conversationService.startConversation();
+    Conversation conversation = conversationService.startConversation().block();
     ParticipantId participantId = ParticipantId.of(1L);
 
-    conversationService.joinParticipantTo(conversation.getId(), participantId);
+    conversationService.joinParticipantTo(conversation.getId(), participantId).block();
 
-    Conversation foundConversation = conversationService.findConversationById(conversation.getId());
+    Conversation foundConversation = conversationService.findConversationById(conversation.getId())
+        .block();
     assertThat(foundConversation.participants()).containsOnly(participantId);
   }
 
@@ -111,7 +97,7 @@ class ConversationServiceTest {
 
     Message message = receiveDefaultMessage(conversationService);
 
-    Message foundMessage = conversationService.findMessageById(message.id());
+    Message foundMessage = conversationService.findMessageById(message.id()).block();
     assertThat(message).isEqualTo(foundMessage);
   }
 
@@ -123,9 +109,9 @@ class ConversationServiceTest {
     CreatedDateTime createdDateTime = CreatedDateTime.of(ZonedDateTime.now().plusNanos(123456));
 
     MessageId storedMessageId = conversationService.receiveMessage(
-        new Message(senderId, messageContent, createdDateTime)).id();
+        new Message(senderId, messageContent, createdDateTime)).block().id();
 
-    Message foundMessage = conversationService.findMessageById(storedMessageId);
+    Message foundMessage = conversationService.findMessageById(storedMessageId).block();
 
     assertThat(foundMessage.createdDateTime()).isEqualTo(createdDateTime);
     assertThat(foundMessage.content()).isEqualTo(messageContent);
@@ -136,34 +122,36 @@ class ConversationServiceTest {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
     MessageId messageId = MessageId.of(1L);
 
-    assertThatThrownBy(() -> conversationService.findMessageById(messageId)).isInstanceOf(
+    Mono<Message> messageByIdMono = conversationService.findMessageById(messageId);
+    assertThatThrownBy(messageByIdMono::block).isInstanceOf(
         MessageNotFoundException.class);
   }
 
   @Test
   void sentMessageAddingToConversation() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    Conversation conversation = conversationService.startConversation();
+    Conversation conversation = conversationService.startConversation().block();
     Message message = receiveDefaultMessage(conversationService);
     ParticipantId senderId = ParticipantId.of(1L);
     conversation.joinedBy(senderId);
 
-    conversationService.sendMessageTo(message.id(), conversation.getId());
+    conversationService.sendMessageTo(message.id(), conversation.getId()).block();
 
-    Conversation foundConversation = conversationService.findConversationById(conversation.getId());
+    Conversation foundConversation = conversationService.findConversationById(conversation.getId())
+        .block();
     assertThat(foundConversation.messages()).containsOnly(message.id());
   }
 
   @Test
   void verifyReceiveAndSendMessageCallsReceiveMessageAndSendMessageTo() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    ConversationId conversationId = conversationService.startConversation().getId();
+    ConversationId conversationId = conversationService.startConversation().block().getId();
     ParticipantId participantId = ParticipantId.of(1L);
-    conversationService.joinParticipantTo(conversationId, participantId);
+    conversationService.joinParticipantTo(conversationId, participantId).block();
     conversationService = spy(conversationService);
     Message message = MessageFactory.defaultWithSender(participantId);
 
-    conversationService.receiveAndSendMessageTo(conversationId, message);
+    conversationService.receiveAndSendMessageTo(conversationId, message).block();
 
     verify(conversationService).receiveMessage(any());
     verify(conversationService).sendMessageTo(any(), any());
@@ -172,13 +160,14 @@ class ConversationServiceTest {
   @Test
   void receiveAndSendMessageReturnsSavedMessage() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    ConversationId conversationId = conversationService.startConversation().getId();
+    ConversationId conversationId = conversationService.startConversation().block().getId();
     ParticipantId participantId = ParticipantId.of(1L);
-    conversationService.joinParticipantTo(conversationId, participantId);
+    conversationService.joinParticipantTo(conversationId, participantId).block();
     Message message = MessageFactory.defaultWithSender(participantId);
     message.setId(null);
 
-    Message savedMessage = conversationService.receiveAndSendMessageTo(conversationId, message);
+    Message savedMessage = conversationService.receiveAndSendMessageTo(conversationId, message)
+        .block();
 
     assertThat(savedMessage).isNotNull();
     assertThat(savedMessage.id()).isNotNull();
@@ -189,19 +178,20 @@ class ConversationServiceTest {
     MessageContent messageContent = MessageContent.of("");
     CreatedDateTime createdDateTime = CreatedDateTime.of(ZonedDateTime.now());
     return conversationService.receiveMessage(
-        new Message(senderId, messageContent, createdDateTime));
+        new Message(senderId, messageContent, createdDateTime)).block();
   }
 
   @Test
   void messageSentByNonParticipantThrowsException() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    Conversation conversation = conversationService.startConversation();
+    Conversation conversation = conversationService.startConversation().block();
     Message message = receiveDefaultMessage(conversationService);
     MessageId messageId = message.id();
     ConversationId conversationId = conversation.getId();
 
+    Mono<Void> sendMessageToMono = conversationService.sendMessageTo(messageId, conversationId);
     assertThatThrownBy(
-        () -> conversationService.sendMessageTo(messageId, conversationId)).isInstanceOf(
+        sendMessageToMono::block).isInstanceOf(
         IllegalArgumentException.class);
   }
 
@@ -210,9 +200,9 @@ class ConversationServiceTest {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
     MessageId messageId = receiveDefaultMessage(conversationService).id();
 
-    conversationService.deleteMessage(messageId);
+    conversationService.deleteMessage(messageId).block();
 
-    Message foundMessage = conversationService.findMessageById(messageId);
+    Message foundMessage = conversationService.findMessageById(messageId).block();
     assertThat(foundMessage.statusFlag()).isEqualTo(MessageStatus.DELETED);
   }
 
@@ -229,7 +219,8 @@ class ConversationServiceTest {
     ConversationService conversationService = ConversationServiceFactory.with(
         conversationRepository, messageRepository);
 
-    Set<Message> messagesInConversation = conversationService.messagesFrom(conversation.getId());
+    Collection<Message> messagesInConversation = conversationService.messagesFrom(
+        conversation.getId()).collectList().block();
 
     assertThat(messagesInConversation).hasSize(2);
   }
@@ -237,7 +228,7 @@ class ConversationServiceTest {
   @Test
   void conversationReturnsMessagesInChronologicalOrder() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    ConversationId conversationId = conversationService.startConversation().getId();
+    ConversationId conversationId = conversationService.startConversation().block().getId();
     CreatedDateTime oldestDateTime = CreatedDateTime.of(ZonedDateTime.now().plusDays(3));
     CreatedDateTime mostRecentDateTime = CreatedDateTime.of(ZonedDateTime.now().plusDays(0));
     CreatedDateTime middleDateTime = CreatedDateTime.of(ZonedDateTime.now().plusDays(2));
@@ -249,7 +240,7 @@ class ConversationServiceTest {
         conversationId);
 
     Collection<Message> orderedMessages = conversationService.messagesByChronologicalOrderFrom(
-        conversationId);
+        conversationId).collectList().block();
 
     assertThat(orderedMessages).extracting(Message::createdDateTime)
         .containsExactly(mostRecentDateTime, middleDateTime, oldestDateTime);
@@ -260,10 +251,10 @@ class ConversationServiceTest {
       ConversationId conversationId) {
     ParticipantId senderId = ParticipantId.of(1L);
     MessageContent messageContent = MessageContent.of("");
-    conversationService.joinParticipantTo(conversationId, senderId);
+    conversationService.joinParticipantTo(conversationId, senderId).block();
     MessageId savedMessageId = conversationService.receiveMessage(
-        new Message(senderId, messageContent, createdDateTime)).id();
-    conversationService.sendMessageTo(savedMessageId, conversationId);
+        new Message(senderId, messageContent, createdDateTime)).block().id();
+    conversationService.sendMessageTo(savedMessageId, conversationId).block();
   }
 
   @Test
@@ -273,9 +264,9 @@ class ConversationServiceTest {
     ConversationService conversationService = conversationServiceWithParticipantInConversation(
         conversationId, participantId);
 
-    conversationService.removeFromConversation(conversationId, participantId);
+    conversationService.removeFromConversation(conversationId, participantId).block();
 
-    Conversation conversation = conversationService.findConversationById(conversationId);
+    Conversation conversation = conversationService.findConversationById(conversationId).block();
     assertThat(conversation.hasParticipant(participantId)).isFalse();
 
   }

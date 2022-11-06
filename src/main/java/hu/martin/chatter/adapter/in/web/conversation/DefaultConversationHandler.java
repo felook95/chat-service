@@ -5,7 +5,6 @@ import hu.martin.chatter.domain.ConversationId;
 import hu.martin.chatter.domain.ParticipantId;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
@@ -25,7 +24,7 @@ public class DefaultConversationHandler implements ConversationHandler {
   public Mono<ServerResponse> startConversation(ServerRequest serverRequest) {
     return conversationService.startConversation().map(ConversationDTO::from).flatMap(
         conversationDTO -> ServerResponse.ok()
-            .body(BodyInserters.fromValue(conversationDTO), ConversationDTO.class));
+            .body(Mono.just(conversationDTO), ConversationDTO.class));
   }
 
   @Override
@@ -36,7 +35,7 @@ public class DefaultConversationHandler implements ConversationHandler {
     ParticipantId domainParticipantId = ParticipantId.of(participantId);
     return conversationService.joinParticipantTo(domainConversationId, domainParticipantId)
         .map(ConversationDTO::from).flatMap(conversationDTO -> ServerResponse.ok()
-            .body(BodyInserters.fromValue(conversationDTO), ConversationDTO.class));
+            .body(Mono.just(conversationDTO), ConversationDTO.class));
   }
 
   @Override
@@ -52,7 +51,7 @@ public class DefaultConversationHandler implements ConversationHandler {
     Long conversationId = Long.valueOf(serverRequest.pathVariable(CONVERSATION_ID_PARAM_NAME));
     return conversationService.findConversationById(ConversationId.of(conversationId))
         .map(ConversationDTO::from).flatMap(conversationDTO -> ServerResponse.ok()
-            .body(BodyInserters.fromValue(conversationDTO), ConversationDTO.class));
+            .body(Mono.just(conversationDTO), ConversationDTO.class));
   }
 
   @Override
@@ -60,7 +59,7 @@ public class DefaultConversationHandler implements ConversationHandler {
     Long conversationId = Long.valueOf(serverRequest.pathVariable(CONVERSATION_ID_PARAM_NAME));
     return conversationService.messagesFrom(ConversationId.of(conversationId)).map(MessageDTO::from)
         .collectList().flatMap(messageDTOs -> ServerResponse.ok()
-            .body(BodyInserters.fromValue(messageDTOs), new ParameterizedTypeReference<>() {
+            .body(Mono.just(messageDTOs), new ParameterizedTypeReference<>() {
             }));
   }
 
@@ -72,6 +71,6 @@ public class DefaultConversationHandler implements ConversationHandler {
             ConversationId.of(conversationId), message))
         .map(MessageDTO::from)
         .flatMap(messageDTO -> ServerResponse.ok()
-            .body(BodyInserters.fromValue(messageDTO), MessageDTO.class));
+            .body(Mono.just(messageDTO), MessageDTO.class));
   }
 }
