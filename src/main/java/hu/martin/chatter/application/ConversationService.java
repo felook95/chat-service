@@ -5,30 +5,30 @@ import hu.martin.chatter.domain.ConversationId;
 import hu.martin.chatter.domain.Message;
 import hu.martin.chatter.domain.MessageId;
 import hu.martin.chatter.domain.ParticipantId;
-import java.util.Collection;
-import java.util.Set;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public interface ConversationService {
 
-  Conversation startConversation();
+  Mono<Conversation> startConversation();
 
-  Conversation findConversationById(ConversationId id);
+  Mono<Conversation> findConversationById(ConversationId id);
 
-  Message findMessageById(MessageId id);
+  Mono<Message> findMessageById(MessageId id);
 
-  Conversation joinParticipantTo(ConversationId conversationId, ParticipantId participantId);
+  Mono<Conversation> joinParticipantTo(ConversationId conversationId, ParticipantId participantId);
 
-  Message receiveMessage(Message message);
+  Mono<Message> receiveMessage(Message message);
 
-  void sendMessageTo(MessageId messageId, ConversationId conversationId);
+  Mono<Void> sendMessageTo(MessageId messageId, ConversationId conversationId);
 
-  Message receiveAndSendMessageTo(ConversationId conversationId, Message message);
+  Mono<Message> receiveAndSendMessageTo(ConversationId conversationId, Message message);
 
-  void deleteMessage(MessageId messageId);
+  Mono<Void> deleteMessage(MessageId messageId);
 
-  Set<Message> messagesFrom(ConversationId conversationId);
+  Flux<Message> messagesFrom(ConversationId conversationId);
 
-  Collection<Message> messagesByChronologicalOrderFrom(ConversationId conversationId);
+  Flux<Message> messagesByChronologicalOrderFrom(ConversationId conversationId);
 
-  void removeFromConversation(ConversationId conversationId, ParticipantId participantId);
+  Mono<Void> removeFromConversation(ConversationId conversationId, ParticipantId participantId);
 }

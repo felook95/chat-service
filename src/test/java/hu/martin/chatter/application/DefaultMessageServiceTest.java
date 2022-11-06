@@ -7,6 +7,8 @@ import hu.martin.chatter.domain.MessageContent;
 import hu.martin.chatter.domain.MessageFactory;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @Tag("unitTest")
 class DefaultMessageServiceTest {
@@ -16,24 +18,28 @@ class DefaultMessageServiceTest {
     MessageService messageService = MessageServiceFactory.withDefaults();
     Message messageToReceive = MessageFactory.defaultWIthIdOf(null);
 
-    Message savedMessage = messageService.receiveMessage(messageToReceive);
+    Mono<Message> savedMessageMono = messageService.receiveMessage(messageToReceive);
 
-    assertThat(savedMessage.id()).isNotNull();
-    assertThat(savedMessage.sender()).isEqualTo(messageToReceive.sender());
-    assertThat(savedMessage.content()).isEqualTo(messageToReceive.content());
-    assertThat(savedMessage.statusFlag()).isEqualTo(messageToReceive.statusFlag());
+    StepVerifier.create(savedMessageMono).consumeNextWith(savedMessage -> {
+      assertThat(savedMessage.id()).isNotNull();
+      assertThat(savedMessage.sender()).isEqualTo(messageToReceive.sender());
+      assertThat(savedMessage.content()).isEqualTo(messageToReceive.content());
+      assertThat(savedMessage.statusFlag()).isEqualTo(messageToReceive.statusFlag());
+    });
   }
 
   @Test
   void editingMessageContentReturnsSameMessageWithUpdatedContent() {
     MessageService messageService = MessageServiceFactory.withDefaults();
     Message messageToReceive = MessageFactory.defaultWIthIdOf(null);
-    Message savedMessage = messageService.receiveMessage(messageToReceive);
+    Mono<Message> savedMessageMono = messageService.receiveMessage(messageToReceive);
 
     MessageContent newContent = MessageContent.of("Edited message");
-    Message editedMessage = messageService.editMessageContent(savedMessage.id(), newContent);
+    Mono<Message> editedMessageMono = savedMessageMono.flatMap(
+        savedMessage -> messageService.editMessageContent(savedMessage.id(), newContent));
 
-    assertThat(editedMessage.id()).isEqualTo(savedMessage.id());
-    assertThat(editedMessage.content()).isEqualTo(newContent);
+    StepVerifier.create(editedMessageMono).consumeNextWith(
+        editedMessage -> assertThat(editedMessage.content()).isEqualTo(newContent));
+
   }
 }

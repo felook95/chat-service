@@ -25,6 +25,9 @@ import java.util.Collection;
 import java.util.Set;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+import reactor.util.function.Tuple2;
 
 @Tag("unitTest")
 class ConversationServiceTest {
@@ -33,39 +36,52 @@ class ConversationServiceTest {
   void createConversation() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
 
-    Conversation conversation = conversationService.startConversation();
+    Mono<Conversation> conversationMono = conversationService.startConversation();
 
-    assertThat(conversation).isNotNull();
+    StepVerifier.create(conversationMono)
+        .consumeNextWith(conversation -> assertThat(conversation).isNotNull());
+
   }
 
   @Test
   void createConversationReturnsConversationWithId() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
 
-    Conversation conversation = conversationService.startConversation();
+    Mono<Conversation> conversationMono = conversationService.startConversation();
 
-    assertThat(conversation.getId()).isNotNull();
+    StepVerifier.create(conversationMono)
+        .consumeNextWith(conversation -> assertThat(conversation.getId()).isNotNull());
   }
 
   @Test
   void multipleCreateConversationCallReturnsConversationsWithDifferentId() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
 
-    Conversation conversation1 = conversationService.startConversation();
-    Conversation conversation2 = conversationService.startConversation();
+    Mono<Conversation> conversationMono1 = conversationService.startConversation();
+    Mono<Conversation> conversationMono2 = conversationService.startConversation();
+    Mono<Tuple2<Conversation, Conversation>> zip = Mono.zip(conversationMono1, conversationMono2);
 
-    assertThat(conversation1.getId()).isNotEqualTo(conversation2.getId());
+    StepVerifier.create(zip).consumeNextWith(objects -> {
+      Conversation conversation1 = objects.getT1();
+      Conversation conversation2 = objects.getT2();
+      assertThat(conversation1.getId()).isNotEqualTo(conversation2.getId());
+    });
   }
 
   @Test
   void conversationServiceFindsCreatedConversation() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    Conversation createdConversation = conversationService.startConversation();
+    Mono<Conversation> createdConversationMono = conversationService.startConversation();
 
-    Conversation foundConversation = conversationService.findConversationById(
-        createdConversation.getId());
+    Mono<Tuple2<Conversation, Conversation>> tuple2Mono = createdConversationMono.flatMap(
+        createdConversation -> conversationService.findConversationById(createdConversation.getId())
+            .zipWith(Mono.just(createdConversation)));
 
-    assertThat(createdConversation).isEqualTo(foundConversation);
+    StepVerifier.create(tuple2Mono).consumeNextWith(objects -> {
+      Conversation foundConversation = objects.getT1();
+      Conversation createdConversation = objects.getT2();
+      assertThat(createdConversation).isEqualTo(foundConversation);
+    });
   }
 
   @Test

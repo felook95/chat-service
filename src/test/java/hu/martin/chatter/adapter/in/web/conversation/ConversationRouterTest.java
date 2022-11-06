@@ -13,13 +13,13 @@ import hu.martin.chatter.domain.Message;
 import hu.martin.chatter.domain.MessageFactory;
 import hu.martin.chatter.domain.ParticipantId;
 import java.time.ZonedDateTime;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -33,7 +33,8 @@ class ConversationRouterTest {
 
   @Test
   void startConversationReturnsConversationDTO() {
-    when(conversationService.startConversation()).thenReturn(ConversationFactory.withDefaults());
+    when(conversationService.startConversation()).thenReturn(
+        Mono.just(ConversationFactory.withDefaults()));
 
     client.post().uri("/conversation").exchange().expectStatus().isOk().expectBody()
         .jsonPath("$.id").isNotEmpty().jsonPath("$.participantIds").isEmpty()
@@ -44,7 +45,7 @@ class ConversationRouterTest {
   void findConversationByIdReturnsFoundDTO() {
     Conversation conversation = ConversationFactory.withDefaults();
     Long conversationId = conversation.getId().id();
-    when(conversationService.findConversationById(any())).thenReturn(conversation);
+    when(conversationService.findConversationById(any())).thenReturn(Mono.just(conversation));
 
     client.get().uri("/conversation/" + conversationId).exchange().expectStatus().isOk()
         .expectBody().json("""
@@ -61,7 +62,7 @@ class ConversationRouterTest {
     ConversationId conversationId = ConversationId.of(1L);
     ParticipantId participantId = ParticipantId.of(123L);
     when(conversationService.joinParticipantTo(conversationId, participantId)).thenReturn(
-        ConversationFactory.withParticipants(participantId));
+        Mono.just(ConversationFactory.withParticipants(participantId)));
 
     client.post()
         .uri("/conversation/" + conversationId.id() + "/participants/" + participantId.id())
@@ -74,7 +75,7 @@ class ConversationRouterTest {
   void sendingMessageToConversationReturnsMessageDTO() {
     Message message = MessageFactory.defaultWIthCreatedDateTimeOf(
         CreatedDateTime.of(ZonedDateTime.parse("2022-11-03T18:27:40.005661434Z")));
-    when(conversationService.receiveAndSendMessageTo(any(), any())).thenReturn(message);
+    when(conversationService.receiveAndSendMessageTo(any(), any())).thenReturn(Mono.just(message));
     MessageDTO messageDTO = MessageDTO.from(message);
 
     client.post().uri("/conversation/1/messages")
@@ -93,7 +94,7 @@ class ConversationRouterTest {
     CreatedDateTime createdDateTime = CreatedDateTime.of(
         ZonedDateTime.parse("2022-11-03T18:38:20.005661434Z"));
     Message message = MessageFactory.defaultWIthCreatedDateTimeOf(createdDateTime);
-    when(conversationService.messagesFrom(any())).thenReturn(Set.of(message));
+    when(conversationService.messagesFrom(any())).thenReturn(Flux.just(message));
 
     client.get().uri("/conversation/1/messages").exchange().expectBody()
         .json("""

@@ -2,11 +2,11 @@ package hu.martin.chatter.application.port;
 
 import hu.martin.chatter.domain.Conversation;
 import hu.martin.chatter.domain.ConversationId;
-import java.util.Optional;
+import reactor.core.publisher.Mono;
 
 public interface ConversationRepository {
 
-  Optional<Conversation> findById(ConversationId id);
+  Mono<Conversation> findById(ConversationId id);
 
-  Conversation save(Conversation conversation);
+  Mono<Conversation> save(Conversation conversation);
 }

@@ -2,14 +2,15 @@ package hu.martin.chatter.application.port;
 
 import hu.martin.chatter.domain.Message;
 import hu.martin.chatter.domain.MessageId;
-import java.util.Optional;
 import java.util.Set;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public interface MessageRepository {
 
-  Message save(Message message);
+  Mono<Message> save(Message message);
 
-  Optional<Message> findById(MessageId messageId);
+  Mono<Message> findById(MessageId messageId);
 
-  Set<Message> findByIds(Set<MessageId> messageIdsToLookFor);
+  Flux<Message> findByIds(Set<MessageId> messageIdsToLookFor);
 }

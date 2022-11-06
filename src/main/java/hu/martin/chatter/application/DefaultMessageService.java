@@ -4,6 +4,7 @@ import hu.martin.chatter.application.port.MessageRepository;
 import hu.martin.chatter.domain.Message;
 import hu.martin.chatter.domain.MessageContent;
 import hu.martin.chatter.domain.MessageId;
+import reactor.core.publisher.Mono;
 
 public class DefaultMessageService implements MessageService {
 
@@ -14,14 +15,16 @@ public class DefaultMessageService implements MessageService {
   }
 
   @Override
-  public Message receiveMessage(Message message) {
+  public Mono<Message> receiveMessage(Message message) {
     return messageRepository.save(message);
   }
 
   @Override
-  public Message editMessageContent(MessageId id, MessageContent newContent) {
-    Message message = messageRepository.findById(id).orElseThrow(MessageNotFoundException::new);
-    message.changeContentTo(newContent);
-    return messageRepository.save(message);
+  public Mono<Message> editMessageContent(MessageId id, MessageContent newContent) {
+    return messageRepository.findById(id).switchIfEmpty(Mono.error(MessageNotFoundException::new))
+        .map(message -> {
+          message.changeContentTo(newContent);
+          return message;
+        }).flatMap(messageRepository::save);
   }
 }

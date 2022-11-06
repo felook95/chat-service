@@ -6,8 +6,8 @@ import hu.martin.chatter.domain.ConversationId;
 import hu.martin.chatter.domain.Message;
 import hu.martin.chatter.domain.MessageId;
 import hu.martin.chatter.domain.ParticipantId;
-import java.util.Collection;
-import java.util.Set;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public class StubConversationServiceForLeaving implements ConversationService {
 
@@ -19,58 +19,61 @@ public class StubConversationServiceForLeaving implements ConversationService {
 
   @Override
 
-  public Conversation startConversation() {
+  public Mono<Conversation> startConversation() {
     return null;
   }
 
   @Override
-  public Conversation findConversationById(ConversationId id) {
-    return conversation;
+  public Mono<Conversation> findConversationById(ConversationId id) {
+    return Mono.just(conversation);
   }
 
   @Override
-  public Message findMessageById(MessageId id) {
+  public Mono<Message> findMessageById(MessageId id) {
     return null;
   }
 
   @Override
-  public Conversation joinParticipantTo(ConversationId conversationId, ParticipantId participantId) {
+  public Mono<Conversation> joinParticipantTo(ConversationId conversationId,
+      ParticipantId participantId) {
 
     return null;
   }
 
   @Override
-  public Message receiveMessage(Message message) {
+  public Mono<Message> receiveMessage(Message message) {
     return null;
   }
 
   @Override
-  public void sendMessageTo(MessageId messageId, ConversationId conversationId) {
-
-  }
-
-  @Override
-  public Message receiveAndSendMessageTo(ConversationId conversationId, Message message) {
+  public Mono<Void> sendMessageTo(MessageId messageId, ConversationId conversationId) {
     return null;
   }
 
   @Override
-  public void deleteMessage(MessageId messageId) {
-
-  }
-
-  @Override
-  public Set<Message> messagesFrom(ConversationId conversationId) {
+  public Mono<Message> receiveAndSendMessageTo(ConversationId conversationId, Message message) {
     return null;
   }
 
   @Override
-  public Collection<Message> messagesByChronologicalOrderFrom(ConversationId conversationId) {
+  public Mono<Void> deleteMessage(MessageId messageId) {
     return null;
   }
 
   @Override
-  public void removeFromConversation(ConversationId conversationId, ParticipantId participantId) {
+  public Flux<Message> messagesFrom(ConversationId conversationId) {
+    return null;
+  }
+
+  @Override
+  public Flux<Message> messagesByChronologicalOrderFrom(ConversationId conversationId) {
+    return null;
+  }
+
+  @Override
+  public Mono<Void> removeFromConversation(ConversationId conversationId,
+      ParticipantId participantId) {
     conversation.leftBy(participantId);
+    return null;
   }
 }

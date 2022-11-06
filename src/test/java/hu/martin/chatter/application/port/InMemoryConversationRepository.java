@@ -4,8 +4,8 @@ import hu.martin.chatter.domain.Conversation;
 import hu.martin.chatter.domain.ConversationId;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
+import reactor.core.publisher.Mono;
 
 public class InMemoryConversationRepository implements ConversationRepository {
 
@@ -13,16 +13,16 @@ public class InMemoryConversationRepository implements ConversationRepository {
   private final AtomicLong sequence = new AtomicLong(1);
 
   @Override
-  public Conversation save(Conversation conversation) {
+  public Mono<Conversation> save(Conversation conversation) {
     if (conversation.getId() == null) {
       conversation.setId(ConversationId.of(sequence.getAndIncrement()));
     }
     conversations.put(conversation.getId(), conversation);
-    return conversation;
+    return Mono.just(conversation);
   }
 
   @Override
-  public Optional<Conversation> findById(ConversationId id) {
-    return Optional.ofNullable(conversations.get(id));
+  public Mono<Conversation> findById(ConversationId id) {
+    return Mono.just(conversations.get(id));
   }
 }

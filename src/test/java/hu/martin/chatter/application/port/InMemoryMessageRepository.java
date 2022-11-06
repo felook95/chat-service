@@ -4,10 +4,11 @@ import hu.martin.chatter.domain.Message;
 import hu.martin.chatter.domain.MessageId;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public class InMemoryMessageRepository implements MessageRepository {
 
@@ -16,23 +17,23 @@ public class InMemoryMessageRepository implements MessageRepository {
   private final AtomicLong sequence = new AtomicLong(1);
 
   @Override
-  public Message save(Message message) {
+  public Mono<Message> save(Message message) {
     if (message.id() == null) {
       message.setId(MessageId.of(sequence.getAndIncrement()));
     }
     messages.put(message.id(), message);
-    return message;
+    return Mono.just(message);
   }
 
   @Override
-  public Optional<Message> findById(MessageId messageId) {
-    return Optional.ofNullable(messages.get(messageId));
+  public Mono<Message> findById(MessageId messageId) {
+    return Mono.just(messages.get(messageId));
   }
 
   @Override
-  public Set<Message> findByIds(Set<MessageId> messageIdsToLookFor) {
-    return messages.values().stream()
-        .filter(message -> messageIdsToLookFor.contains(message.id()))
-        .collect(Collectors.toSet());
+  public Flux<Message> findByIds(Set<MessageId> messageIdsToLookFor) {
+    Stream<Message> messageStream = messages.values().stream()
+        .filter(message -> messageIdsToLookFor.contains(message.id()));
+    return Flux.fromStream(messageStream);
   }
 }

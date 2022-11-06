@@ -7,9 +7,10 @@ import hu.martin.chatter.domain.ConversationId;
 import hu.martin.chatter.domain.Message;
 import hu.martin.chatter.domain.MessageId;
 import hu.martin.chatter.domain.ParticipantId;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.Set;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public class DefaultConversationService implements ConversationService {
 
@@ -23,46 +24,49 @@ public class DefaultConversationService implements ConversationService {
   }
 
   @Override
-  public Conversation startConversation() {
+  public Mono<Conversation> startConversation() {
     Conversation conversation = new Conversation();
     return saveConversation(conversation);
   }
 
   @Override
-  public Conversation findConversationById(ConversationId id) {
-    return conversationRepository.findById(id).orElseThrow(ConversationNotFoundException::new);
+  public Mono<Conversation> findConversationById(ConversationId id) {
+    return conversationRepository.findById(id)
+        .switchIfEmpty(Mono.error(ConversationNotFoundException::new));
   }
 
   @Override
-  public Message findMessageById(MessageId id) {
-    return messageRepository.findById(id).orElseThrow(MessageNotFoundException::new);
+  public Mono<Message> findMessageById(MessageId id) {
+    return messageRepository.findById(id).switchIfEmpty(Mono.error(MessageNotFoundException::new));
   }
 
   @Override
-  public Conversation joinParticipantTo(ConversationId conversationId,
+  public Mono<Conversation> joinParticipantTo(ConversationId conversationId,
       ParticipantId participantId) {
-    Conversation conversation = findConversationById(conversationId);
-    conversation.joinedBy(participantId);
-    saveConversation(conversation);
-    return conversation;
+    return findConversationById(conversationId).map(conversation -> {
+      conversation.joinedBy(participantId);
+      return conversation;
+    }).flatMap(this::saveConversation);
   }
 
   @Override
-  public void sendMessageTo(MessageId messageId, ConversationId conversationId) {
-    Conversation conversation = findConversationById(conversationId);
-    Message message = findMessageById(messageId);
-    ParticipantId senderId = message.sender();
-    assertConversationHasParticipant(conversation, senderId);
-    conversation.messageSent(messageId);
-    saveConversation(conversation);
+  public Mono<Void> sendMessageTo(MessageId messageId, ConversationId conversationId) {
+    return Mono.zip(findConversationById(conversationId), findMessageById(messageId))
+        .map(objects -> {
+          Conversation conversation = objects.getT1();
+          Message message = objects.getT2();
+          ParticipantId senderId = message.sender();
+          assertConversationHasParticipant(conversation, senderId);
+          conversation.messageSent(messageId);
+          return conversation;
+        }).map(this::saveConversation).then();
   }
 
   @Override
-  public Message receiveAndSendMessageTo(ConversationId conversationId, Message message) {
-    Message receivedMessage = receiveMessage(message);
-    MessageId messageId = receivedMessage.id();
-    sendMessageTo(messageId, conversationId);
-    return receivedMessage;
+  public Mono<Message> receiveAndSendMessageTo(ConversationId conversationId, Message message) {
+    return receiveMessage(message)
+        .flatMap(receivedMessage -> sendMessageTo(message.id(), conversationId).thenReturn(
+            receivedMessage));
   }
 
   private static void assertConversationHasParticipant(Conversation conversation,
@@ -74,42 +78,45 @@ public class DefaultConversationService implements ConversationService {
   }
 
   @Override
-  public void deleteMessage(MessageId messageId) {
-    Message foundMessage = findMessageById(messageId);
-    foundMessage.delete();
-    messageRepository.save(foundMessage);
+  public Mono<Void> deleteMessage(MessageId messageId) {
+    return findMessageById(messageId).map(message -> {
+      message.delete();
+      return messageRepository.save(message);
+    }).then();
   }
 
   @Override
-  public Message receiveMessage(Message message) {
+  public Mono<Message> receiveMessage(Message message) {
     return messageRepository.save(message);
   }
 
   @Override
-  public Collection<Message> messagesByChronologicalOrderFrom(ConversationId conversationId) {
-    return messagesFrom(conversationId).stream()
-        .sorted(Comparator.comparing(Message::createdDateTime))
-        .toList();
+  public Flux<Message> messagesByChronologicalOrderFrom(ConversationId conversationId) {
+    return messagesFrom(conversationId).collectSortedList(
+            Comparator.comparing(Message::createdDateTime))
+        .flatMapMany(Flux::fromIterable);
   }
 
   @Override
-  public void removeFromConversation(ConversationId conversationId, ParticipantId participantId) {
-    Conversation conversation = findConversationById(conversationId);
-    conversation.leftBy(participantId);
-    saveConversation(conversation);
+  public Mono<Void> removeFromConversation(ConversationId conversationId,
+      ParticipantId participantId) {
+    return findConversationById(conversationId).map(conversation -> {
+      conversation.leftBy(participantId);
+      return conversation;
+    }).map(this::saveConversation).then();
   }
 
-  private Conversation saveConversation(Conversation conversation) {
+  private Mono<Conversation> saveConversation(Conversation conversation) {
     return conversationRepository.save(conversation);
   }
 
   @Override
-  public Set<Message> messagesFrom(ConversationId conversationId) {
-    Set<MessageId> messageIdsInConversation = findConversationById(conversationId).messages();
-    return messagesByIds(messageIdsInConversation);
+  public Flux<Message> messagesFrom(ConversationId conversationId) {
+    return findConversationById(conversationId).map(Conversation::messages)
+        .flatMapMany(this::messagesByIds);
   }
 
-  private Set<Message> messagesByIds(Set<MessageId> messageIdsInConversation) {
+  private Flux<Message> messagesByIds(Set<MessageId> messageIdsInConversation) {
     return messageRepository.findByIds(messageIdsInConversation);
   }
 }
