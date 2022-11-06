@@ -6,11 +6,11 @@ import hu.martin.chatter.application.port.ConversationRepository;
 import hu.martin.chatter.application.port.InMemoryConversationRepository;
 import hu.martin.chatter.application.port.InMemoryMessageRepository;
 import hu.martin.chatter.application.port.MessageRepository;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
-public class ChatterConfiguration {
+@TestConfiguration
+public class ChatterTestConfiguration {
 
   @Bean
   ConversationService conversationService() {
