@@ -34,7 +34,7 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-cassandra-reactive</artifactId>
+            <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
         </dependency>
 
         <!--    Testing dependencies-->
@@ -56,7 +56,7 @@
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>cassandra</artifactId>
+            <artifactId>mongodb</artifactId>
             <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>

@@ -1,27 +1,25 @@
-package hu.martin.chatter.adapter.out.cassandra;
+package hu.martin.chatter.adapter.out.mongodb;
 
 import hu.martin.chatter.domain.Conversation;
 import hu.martin.chatter.domain.ConversationId;
-import org.springframework.data.cassandra.core.mapping.CassandraType;
-import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
-import org.springframework.data.cassandra.core.mapping.Table;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Table("conversations")
+@Document(collection = "conversations")
 public class ConversationDBO {
 
-    @PrimaryKey
+    @Transient
+    public static final String SEQUENCE_NAME = "conversation_sequence";
+
+    @Id
     Long id;
 
-    @Column
-    @CassandraType(type = CassandraType.Name.SET, userTypeName = "joined_participant_type", typeArguments = CassandraType.Name.UDT)
     Set<JoinedParticipant> participantIds;
 
-    @Column
-    @CassandraType(type = CassandraType.Name.SET, userTypeName = "sent_message_type", typeArguments = CassandraType.Name.UDT)
     Set<SentMessage> messageIds;
 
     public Long getId() {

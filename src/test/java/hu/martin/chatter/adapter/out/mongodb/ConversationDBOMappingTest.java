@@ -1,4 +1,4 @@
-package hu.martin.chatter.adapter.out.cassandra;
+package hu.martin.chatter.adapter.out.mongodb;
 
 import hu.martin.chatter.domain.Conversation;
 import hu.martin.chatter.domain.ConversationId;

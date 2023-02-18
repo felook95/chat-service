@@ -1,16 +1,11 @@
-package hu.martin.chatter.adapter.out.cassandra;
+package hu.martin.chatter.adapter.out.mongodb;
+
+import hu.martin.chatter.domain.*;
+import org.junit.jupiter.api.Test;
+
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import hu.martin.chatter.domain.CreatedDateTime;
-import hu.martin.chatter.domain.Message;
-import hu.martin.chatter.domain.MessageContent;
-import hu.martin.chatter.domain.MessageFactory;
-import hu.martin.chatter.domain.MessageId;
-import hu.martin.chatter.domain.MessageStatus;
-import hu.martin.chatter.domain.ParticipantId;
-import java.time.LocalDateTime;
-import org.junit.jupiter.api.Test;
 
 class MessageDBOMappingTest {
 
@@ -64,7 +59,7 @@ class MessageDBOMappingTest {
   }
 
   private static void assertMappedCorrectly(MessageDBO messageDBO, Message message) {
-    assertThat(message.sender()).isEqualTo(ParticipantId.of(messageDBO.getSenderId()));
+    assertThat(message.sender()).isEqualTo(messageDBO.getSenderId().asParticipantId());
     assertThat(message.content()).isEqualTo(MessageContent.of(messageDBO.getContent()));
     assertThat(message.statusFlag()).isEqualTo(MessageStatus.valueOf(messageDBO.getStatusFlag()));
     assertThat(message.createdDateTime()).isEqualTo(

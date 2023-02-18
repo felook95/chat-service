@@ -1,15 +1,9 @@
-package hu.martin.chatter.adapter.out.cassandra;
+package hu.martin.chatter.adapter.out.mongodb;
 
 import hu.martin.chatter.domain.MessageId;
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
-import org.springframework.data.cassandra.core.mapping.Table;
-import org.springframework.data.cassandra.core.mapping.UserDefinedType;
 
-@Table("sent_message")
-@UserDefinedType("sent_message_type")
 public class SentMessage {
 
-  @PrimaryKey
   Long id;
 
   public SentMessage() {

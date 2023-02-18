@@ -1,4 +1,4 @@
-package hu.martin.chatter.adapter.out.cassandra;
+package hu.martin.chatter.adapter.out.mongodb;
 
 import hu.martin.chatter.domain.Conversation;
 import hu.martin.chatter.domain.ConversationFactory;
@@ -6,18 +6,30 @@ import hu.martin.chatter.domain.ConversationId;
 import hu.martin.chatter.domain.ParticipantId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.cassandra.DataCassandraTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-@Import(ConversationR2DBCRepositoryAdapter.class)
-@DataCassandraTest
+@Testcontainers
+@SpringBootTest
 class ConversationR2DBCRepositoryAdapterTest {
+
+    @Container
+    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:latest");
 
     @Autowired
     ConversationR2DBCRepositoryAdapter conversationR2DBCRepositoryAdapter;
+
+    @DynamicPropertySource
+    static void setProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
+    }
 
     @Test
     void savedConversationCanBeFoundByItsId() {
