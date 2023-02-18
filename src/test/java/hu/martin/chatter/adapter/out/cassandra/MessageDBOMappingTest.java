@@ -1,4 +1,4 @@
-package hu.martin.chatter.adapter.out.r2dbc;
+package hu.martin.chatter.adapter.out.cassandra;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

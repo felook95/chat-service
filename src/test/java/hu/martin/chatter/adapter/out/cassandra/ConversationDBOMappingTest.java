@@ -1,13 +1,14 @@
-package hu.martin.chatter.adapter.out.r2dbc;
-
-import static org.assertj.core.api.Assertions.assertThat;
+package hu.martin.chatter.adapter.out.cassandra;
 
 import hu.martin.chatter.domain.Conversation;
 import hu.martin.chatter.domain.ConversationId;
 import hu.martin.chatter.domain.MessageId;
 import hu.martin.chatter.domain.ParticipantId;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
+
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ConversationDBOMappingTest {
 
@@ -15,8 +16,15 @@ class ConversationDBOMappingTest {
   void DBOToDomainIsMappedCorrectly() {
     ConversationDBO conversationDBO = new ConversationDBO();
     conversationDBO.setId(999L);
-    conversationDBO.setParticipantIds(Set.of(1L, 2L));
-    conversationDBO.setMessageIds(Set.of(1L, 2L, 3L));
+    conversationDBO.setParticipantIds(Set.of(
+        new JoinedParticipant(1L),
+        new JoinedParticipant(2L)
+    ));
+    conversationDBO.setMessageIds(Set.of(
+        new SentMessage(1L),
+        new SentMessage(2L),
+        new SentMessage(3L)
+    ));
 
     Conversation conversation = conversationDBO.asConversation();
 
@@ -36,8 +44,13 @@ class ConversationDBOMappingTest {
     ConversationDBO conversationDBO = ConversationDBO.from(conversationToTransform);
 
     assertThat(conversationDBO.getId()).isEqualTo(1L);
-    assertThat(conversationDBO.getParticipantIds()).containsOnly(2L);
-    assertThat(conversationDBO.getMessageIds()).containsOnly(3L, 4L);
+    assertThat(conversationDBO.getParticipantIds())
+        .extracting(JoinedParticipant::asParticipantId)
+        .extracting(ParticipantId::id)
+        .containsOnly(2L);
+    assertThat(conversationDBO.getMessageIds())
+        .extracting(SentMessage::asMessageId)
+        .extracting(MessageId::id).containsOnly(3L, 4L);
   }
 
   @Test
@@ -51,8 +64,12 @@ class ConversationDBOMappingTest {
     ConversationDBO conversationDBO = ConversationDBO.from(conversationToTransform);
 
     assertThat(conversationDBO.getId()).isNull();
-    assertThat(conversationDBO.getParticipantIds()).containsOnly(2L);
-    assertThat(conversationDBO.getMessageIds()).containsOnly(3L, 4L);
+    assertThat(conversationDBO.getParticipantIds())
+        .extracting(JoinedParticipant::asParticipantId)
+        .extracting(ParticipantId::id).containsOnly(2L);
+    assertThat(conversationDBO.getMessageIds())
+        .extracting(SentMessage::asMessageId)
+        .extracting(MessageId::id).containsOnly(3L, 4L);
   }
 
   @Test

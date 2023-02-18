@@ -1,4 +1,4 @@
-package hu.martin.chatter.adapter.out.r2dbc;
+package hu.martin.chatter.adapter.out.cassandra;
 
 import hu.martin.chatter.domain.CreatedDateTime;
 import hu.martin.chatter.domain.Message;
@@ -8,8 +8,8 @@ import hu.martin.chatter.domain.MessageStatus;
 import hu.martin.chatter.domain.ParticipantId;
 import java.time.LocalDateTime;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.data.cassandra.core.mapping.Column;
+import org.springframework.data.cassandra.core.mapping.Table;
 
 @Table("message")
 public class MessageDBO {
