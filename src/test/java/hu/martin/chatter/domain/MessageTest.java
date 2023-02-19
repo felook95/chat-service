@@ -1,11 +1,13 @@
 package hu.martin.chatter.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.time.LocalDateTime;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigInteger;
+import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Tag("unitTest")
 class MessageTest {
@@ -28,7 +30,7 @@ class MessageTest {
 
   @Test
   void messageStoresContent() {
-    ParticipantId participantId = ParticipantId.of(1L);
+    ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
     MessageContent messageContent = new MessageContent("Test message");
     Message message = new Message(participantId, messageContent,
         CreatedDateTime.of(LocalDateTime.now()));

@@ -1,25 +1,21 @@
 package hu.martin.chatter.adapter.in.web.conversation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import hu.martin.chatter.domain.CreatedDateTime;
-import hu.martin.chatter.domain.Message;
-import hu.martin.chatter.domain.MessageContent;
-import hu.martin.chatter.domain.MessageFactory;
-import hu.martin.chatter.domain.MessageId;
-import hu.martin.chatter.domain.MessageStatus;
-import hu.martin.chatter.domain.ParticipantId;
-import java.time.LocalDateTime;
+import hu.martin.chatter.domain.*;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigInteger;
+import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("unitTest")
 class MessageDTOMappingTest {
 
   @Test
   void domainToDTOIsMappedCorrectly() {
-    MessageId messageId = MessageId.of(1L);
-    ParticipantId sender = ParticipantId.of(1L);
+    MessageId messageId = MessageId.of(BigInteger.valueOf(1L));
+    ParticipantId sender = ParticipantId.of(BigInteger.valueOf(1L));
     MessageContent messageContent = MessageContent.of("Test message");
     CreatedDateTime createdDateTime = CreatedDateTime.of(LocalDateTime.now().plusNanos(12345L));
     Message message = new Message(sender, messageContent, createdDateTime);

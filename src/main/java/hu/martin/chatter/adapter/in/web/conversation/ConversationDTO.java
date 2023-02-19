@@ -4,13 +4,15 @@ import hu.martin.chatter.domain.Conversation;
 import hu.martin.chatter.domain.ConversationId;
 import hu.martin.chatter.domain.MessageId;
 import hu.martin.chatter.domain.ParticipantId;
+
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public record ConversationDTO(Long id, Set<Long> participantIds, Set<Long> messageIds) {
+public record ConversationDTO(BigInteger id, Set<BigInteger> participantIds, Set<BigInteger> messageIds) {
 
-  public ConversationDTO(Long id, Set<Long> participantIds, Set<Long> messageIds) {
+  public ConversationDTO(BigInteger id, Set<BigInteger> participantIds, Set<BigInteger> messageIds) {
     this.id = id;
     this.participantIds = participantIds == null ? Collections.emptySet() : participantIds;
     this.messageIds = messageIds == null ? Collections.emptySet() : messageIds;

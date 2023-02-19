@@ -1,30 +1,23 @@
 package hu.martin.chatter.application;
 
+import hu.martin.chatter.adapter.out.inmemory.InMemoryConversationRepository;
+import hu.martin.chatter.adapter.out.inmemory.InMemoryMessageRepository;
+import hu.martin.chatter.application.port.ConversationRepository;
+import hu.martin.chatter.application.port.MessageRepository;
+import hu.martin.chatter.domain.*;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Mono;
+
+import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.util.Collection;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-
-import hu.martin.chatter.application.port.ConversationRepository;
-import hu.martin.chatter.application.port.InMemoryConversationRepository;
-import hu.martin.chatter.application.port.InMemoryMessageRepository;
-import hu.martin.chatter.application.port.MessageRepository;
-import hu.martin.chatter.domain.Conversation;
-import hu.martin.chatter.domain.ConversationFactory;
-import hu.martin.chatter.domain.ConversationId;
-import hu.martin.chatter.domain.CreatedDateTime;
-import hu.martin.chatter.domain.Message;
-import hu.martin.chatter.domain.MessageContent;
-import hu.martin.chatter.domain.MessageFactory;
-import hu.martin.chatter.domain.MessageId;
-import hu.martin.chatter.domain.MessageStatus;
-import hu.martin.chatter.domain.ParticipantId;
-import java.time.LocalDateTime;
-import java.util.Collection;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Mono;
 
 @Tag("unitTest")
 class ConversationServiceTest {
@@ -71,7 +64,7 @@ class ConversationServiceTest {
   @Test
   void notFoundConversationThrowsConversationNotFoundException() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    ConversationId conversationId = ConversationId.of(1L);
+    ConversationId conversationId = ConversationId.of(BigInteger.valueOf(1L));
 
     Mono<Conversation> conversationByIdMono = conversationService.findConversationById(conversationId);
     assertThatThrownBy(conversationByIdMono::block).isInstanceOf(
@@ -82,7 +75,7 @@ class ConversationServiceTest {
   void joinParticipantAddsParticipantToConversation() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
     Conversation conversation = conversationService.startConversation().block();
-    ParticipantId participantId = ParticipantId.of(1L);
+    ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
 
     conversationService.joinParticipantTo(conversation.getId(), participantId).block();
 
@@ -104,7 +97,7 @@ class ConversationServiceTest {
   @Test
   void receiveMessageStoresMessageContent() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    ParticipantId senderId = ParticipantId.of(1L);
+    ParticipantId senderId = ParticipantId.of(BigInteger.valueOf(1L));
     MessageContent messageContent = MessageContent.of("Test message");
     CreatedDateTime createdDateTime = CreatedDateTime.of(LocalDateTime.now().plusNanos(123456));
 
@@ -120,7 +113,7 @@ class ConversationServiceTest {
   @Test
   void notFoundMessageThrowsMessageNotFoundException() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    MessageId messageId = MessageId.of(1L);
+    MessageId messageId = MessageId.of(BigInteger.valueOf(1L));
 
     Mono<Message> messageByIdMono = conversationService.findMessageById(messageId);
     assertThatThrownBy(messageByIdMono::block).isInstanceOf(
@@ -132,7 +125,7 @@ class ConversationServiceTest {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
     Conversation conversation = conversationService.startConversation().block();
     Message message = receiveDefaultMessage(conversationService);
-    ParticipantId senderId = ParticipantId.of(1L);
+    ParticipantId senderId = ParticipantId.of(BigInteger.valueOf(1L));
     conversation.joinedBy(senderId);
 
     conversationService.sendMessageTo(message.id(), conversation.getId()).block();
@@ -146,7 +139,7 @@ class ConversationServiceTest {
   void verifyReceiveAndSendMessageCallsReceiveMessageAndSendMessageTo() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
     ConversationId conversationId = conversationService.startConversation().block().getId();
-    ParticipantId participantId = ParticipantId.of(1L);
+    ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
     conversationService.joinParticipantTo(conversationId, participantId).block();
     conversationService = spy(conversationService);
     Message message = MessageFactory.defaultWithSender(participantId);
@@ -161,7 +154,7 @@ class ConversationServiceTest {
   void receiveAndSendMessageReturnsSavedMessage() {
     ConversationService conversationService = ConversationServiceFactory.withDefaults();
     ConversationId conversationId = conversationService.startConversation().block().getId();
-    ParticipantId participantId = ParticipantId.of(1L);
+    ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
     conversationService.joinParticipantTo(conversationId, participantId).block();
     Message message = MessageFactory.defaultWithSender(participantId);
     message.setId(null);
@@ -174,7 +167,7 @@ class ConversationServiceTest {
   }
 
   private static Message receiveDefaultMessage(ConversationService conversationService) {
-    ParticipantId senderId = ParticipantId.of(1L);
+    ParticipantId senderId = ParticipantId.of(BigInteger.valueOf(1L));
     MessageContent messageContent = MessageContent.of("");
     CreatedDateTime createdDateTime = CreatedDateTime.of(LocalDateTime.now());
     return conversationService.receiveMessage(
@@ -210,12 +203,12 @@ class ConversationServiceTest {
   void messagesForConversationReturnsAllMessages() {
     ConversationRepository conversationRepository = new InMemoryConversationRepository();
     Conversation conversation = ConversationFactory.withDefaults();
-    conversation.messageSent(MessageId.of(1L));
-    conversation.messageSent(MessageId.of(2L));
+    conversation.messageSent(MessageId.of(BigInteger.valueOf(1L)));
+    conversation.messageSent(MessageId.of(BigInteger.valueOf(2L)));
     conversationRepository.save(conversation);
     MessageRepository messageRepository = new InMemoryMessageRepository();
-    messageRepository.save(MessageFactory.defaultWIthIdOf(MessageId.of(1L)));
-    messageRepository.save(MessageFactory.defaultWIthIdOf(MessageId.of(2L)));
+    messageRepository.save(MessageFactory.defaultWIthIdOf(MessageId.of(BigInteger.valueOf(1L))));
+    messageRepository.save(MessageFactory.defaultWIthIdOf(MessageId.of(BigInteger.valueOf(2L))));
     ConversationService conversationService = ConversationServiceFactory.with(
         conversationRepository, messageRepository);
 
@@ -249,7 +242,7 @@ class ConversationServiceTest {
   private void saveRandomMessageToConversationWithCreatedDateTime(
       ConversationService conversationService, CreatedDateTime createdDateTime,
       ConversationId conversationId) {
-    ParticipantId senderId = ParticipantId.of(1L);
+    ParticipantId senderId = ParticipantId.of(BigInteger.valueOf(1L));
     MessageContent messageContent = MessageContent.of("");
     conversationService.joinParticipantTo(conversationId, senderId).block();
     MessageId savedMessageId = conversationService.receiveMessage(
@@ -259,8 +252,8 @@ class ConversationServiceTest {
 
   @Test
   void leavingConversationRemovesParticipantFromConversation() {
-    ConversationId conversationId = ConversationId.of(1L);
-    ParticipantId participantId = ParticipantId.of(1L);
+    ConversationId conversationId = ConversationId.of(BigInteger.valueOf(1L));
+    ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
     ConversationService conversationService = conversationServiceWithParticipantInConversation(
         conversationId, participantId);
 

@@ -3,30 +3,27 @@ package hu.martin.chatter.adapter.out.mongodb;
 import hu.martin.chatter.domain.Conversation;
 import hu.martin.chatter.domain.ConversationId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigInteger;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Document(collection = "conversations")
 public class ConversationDBO {
 
-    @Transient
-    public static final String SEQUENCE_NAME = "conversation_sequence";
-
     @Id
-    Long id;
+    BigInteger id;
 
     Set<JoinedParticipant> participantIds;
 
     Set<SentMessage> messageIds;
 
-    public Long getId() {
+    public BigInteger getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(BigInteger id) {
         this.id = id;
     }
 

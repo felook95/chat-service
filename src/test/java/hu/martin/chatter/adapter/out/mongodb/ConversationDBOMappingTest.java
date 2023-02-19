@@ -6,6 +6,7 @@ import hu.martin.chatter.domain.MessageId;
 import hu.martin.chatter.domain.ParticipantId;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigInteger;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,61 +16,61 @@ class ConversationDBOMappingTest {
   @Test
   void DBOToDomainIsMappedCorrectly() {
     ConversationDBO conversationDBO = new ConversationDBO();
-    conversationDBO.setId(999L);
+    conversationDBO.setId(BigInteger.valueOf(999L));
     conversationDBO.setParticipantIds(Set.of(
-        new JoinedParticipant(1L),
-        new JoinedParticipant(2L)
+        new JoinedParticipant(BigInteger.valueOf(1L)),
+        new JoinedParticipant(BigInteger.valueOf(2L))
     ));
     conversationDBO.setMessageIds(Set.of(
-        new SentMessage(1L),
-        new SentMessage(2L),
-        new SentMessage(3L)
+        new SentMessage(BigInteger.valueOf(1L)),
+        new SentMessage(BigInteger.valueOf(2L)),
+        new SentMessage(BigInteger.valueOf(3L))
     ));
 
     Conversation conversation = conversationDBO.asConversation();
 
     assertThat(conversation.getId().id()).isEqualTo(999L);
-    assertThat(conversation.participants()).extracting(ParticipantId::id).containsOnly(1L, 2L);
-    assertThat(conversation.messages()).extracting(MessageId::id).containsOnly(1L, 2L, 3L);
+    assertThat(conversation.participants()).extracting(ParticipantId::id).containsOnly(BigInteger.valueOf(1L), BigInteger.valueOf(2L));
+    assertThat(conversation.messages()).extracting(MessageId::id).containsOnly(BigInteger.valueOf(1L), BigInteger.valueOf(2L), BigInteger.valueOf(3L));
   }
 
   @Test
   void domainToDTOIsMappedCorrectly() {
     Conversation conversationToTransform = new Conversation();
-    conversationToTransform.setId(ConversationId.of(1L));
-    conversationToTransform.joinedBy(ParticipantId.of(2L));
-    conversationToTransform.messageSent(MessageId.of(3L));
-    conversationToTransform.messageSent(MessageId.of(4L));
+    conversationToTransform.setId(ConversationId.of(BigInteger.valueOf(1L)));
+    conversationToTransform.joinedBy(ParticipantId.of(BigInteger.valueOf(2L)));
+    conversationToTransform.messageSent(MessageId.of(BigInteger.valueOf(3L)));
+    conversationToTransform.messageSent(MessageId.of(BigInteger.valueOf(4L)));
 
     ConversationDBO conversationDBO = ConversationDBO.from(conversationToTransform);
 
-    assertThat(conversationDBO.getId()).isEqualTo(1L);
+    assertThat(conversationDBO.getId()).isEqualTo(BigInteger.valueOf(1L));
     assertThat(conversationDBO.getParticipantIds())
         .extracting(JoinedParticipant::asParticipantId)
         .extracting(ParticipantId::id)
-        .containsOnly(2L);
+        .containsOnly(BigInteger.valueOf(2L));
     assertThat(conversationDBO.getMessageIds())
         .extracting(SentMessage::asMessageId)
-        .extracting(MessageId::id).containsOnly(3L, 4L);
+        .extracting(MessageId::id).containsOnly(BigInteger.valueOf(3L), BigInteger.valueOf(4L));
   }
 
   @Test
   void domainToDTOIsMappedCorrectlyWithNullId() {
     Conversation conversationToTransform = new Conversation();
     conversationToTransform.setId(null);
-    conversationToTransform.joinedBy(ParticipantId.of(2L));
-    conversationToTransform.messageSent(MessageId.of(3L));
-    conversationToTransform.messageSent(MessageId.of(4L));
+    conversationToTransform.joinedBy(ParticipantId.of(BigInteger.valueOf(2L)));
+    conversationToTransform.messageSent(MessageId.of(BigInteger.valueOf(3L)));
+    conversationToTransform.messageSent(MessageId.of(BigInteger.valueOf(4L)));
 
     ConversationDBO conversationDBO = ConversationDBO.from(conversationToTransform);
 
     assertThat(conversationDBO.getId()).isNull();
     assertThat(conversationDBO.getParticipantIds())
         .extracting(JoinedParticipant::asParticipantId)
-        .extracting(ParticipantId::id).containsOnly(2L);
+        .extracting(ParticipantId::id).containsOnly(BigInteger.valueOf(2L));
     assertThat(conversationDBO.getMessageIds())
         .extracting(SentMessage::asMessageId)
-        .extracting(MessageId::id).containsOnly(3L, 4L);
+        .extracting(MessageId::id).containsOnly(BigInteger.valueOf(3L), BigInteger.valueOf(4L));
   }
 
   @Test

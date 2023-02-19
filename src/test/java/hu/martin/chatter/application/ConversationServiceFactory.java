@@ -1,8 +1,8 @@
 package hu.martin.chatter.application;
 
 import hu.martin.chatter.application.port.ConversationRepository;
-import hu.martin.chatter.application.port.InMemoryConversationRepository;
-import hu.martin.chatter.application.port.InMemoryMessageRepository;
+import hu.martin.chatter.adapter.out.inmemory.InMemoryConversationRepository;
+import hu.martin.chatter.adapter.out.inmemory.InMemoryMessageRepository;
 import hu.martin.chatter.application.port.MessageRepository;
 
 public class ConversationServiceFactory {

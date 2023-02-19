@@ -1,10 +1,12 @@
 package hu.martin.chatter.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigInteger;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Tag("unitTest")
 class ConversationMessagingTest {
@@ -19,7 +21,7 @@ class ConversationMessagingTest {
   @Test
   void messageStoredInConversation() {
     Conversation conversation = new Conversation();
-    MessageId messageId = MessageId.of(1L);
+    MessageId messageId = MessageId.of(BigInteger.valueOf(1L));
 
     conversation.messageSent(messageId);
 

@@ -3,6 +3,7 @@ package hu.martin.chatter.adapter.out.mongodb;
 import hu.martin.chatter.domain.*;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -11,8 +12,8 @@ class MessageDBOMappingTest {
 
   @Test
   void domainToDBOIsMappedCorrectly() {
-    MessageId messageId = MessageId.of(1L);
-    ParticipantId sender = ParticipantId.of(1L);
+    MessageId messageId = MessageId.of(BigInteger.valueOf(1L));
+    ParticipantId sender = ParticipantId.of(BigInteger.valueOf(1L));
     MessageContent messageContent = MessageContent.of("Test message");
     CreatedDateTime createdDateTime = CreatedDateTime.of(LocalDateTime.now().plusNanos(12345L));
     Message message = new Message(sender, messageContent, createdDateTime);

@@ -6,9 +6,11 @@ import hu.martin.chatter.domain.MessageContent;
 import hu.martin.chatter.domain.MessageId;
 import hu.martin.chatter.domain.MessageStatus;
 import hu.martin.chatter.domain.ParticipantId;
+
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
-public record MessageDTO(Long id, Long senderId, String content, String statusFlag,
+public record MessageDTO(BigInteger id, BigInteger senderId, String content, String statusFlag,
                          LocalDateTime createdDateTime) {
 
   public static MessageDTO from(Message message) {

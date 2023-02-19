@@ -18,7 +18,8 @@ public class ConversationR2DBCRepositoryAdapter implements ConversationRepositor
 
   @Override
   public Mono<Conversation> findById(ConversationId id) {
-    return Mono.empty();
+    return conversationRepository.findById(id.id())
+            .map(ConversationDBO::asConversation);
   }
 
   @Override

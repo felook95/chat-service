@@ -1,10 +1,12 @@
 package hu.martin.chatter.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigInteger;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Tag("unitTest")
 class ConversationParticipationTest {
@@ -18,7 +20,7 @@ class ConversationParticipationTest {
 
   @Test
   void joinParticipant() {
-    ParticipantId participantId = ParticipantId.of(1L);
+    ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
 
     Conversation conversation = new Conversation();
     conversation.joinedBy(participantId);
@@ -30,14 +32,14 @@ class ConversationParticipationTest {
   @Test
   void missingParticipant() {
     Conversation conversation = new Conversation();
-    ParticipantId participantId = ParticipantId.of(1L);
+    ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
 
     assertThat(conversation.isJoined(participantId)).isFalse();
   }
 
   @Test
   void alreadyJoinedParticipantNotJoinedAgain() {
-    ParticipantId addedParticipantId = ParticipantId.of(1L);
+    ParticipantId addedParticipantId = ParticipantId.of(BigInteger.valueOf(1L));
     Conversation conversation = ConversationFactory.withParticipants(addedParticipantId);
 
     conversation.joinedBy(addedParticipantId);
@@ -55,7 +57,7 @@ class ConversationParticipationTest {
 
   @Test
   void leaveConversation() {
-    ParticipantId participantId = ParticipantId.of(1L);
+    ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
     Conversation conversation = ConversationFactory.withParticipants(participantId);
 
     conversation.leftBy(participantId);
@@ -65,8 +67,8 @@ class ConversationParticipationTest {
 
   @Test
   void leavingOnlyRemovesTheLeftUser() {
-    ParticipantId leavingParticipantId = ParticipantId.of(1L);
-    ParticipantId stayingParticipantId = ParticipantId.of(2L);
+    ParticipantId leavingParticipantId = ParticipantId.of(BigInteger.valueOf(1L));
+    ParticipantId stayingParticipantId = ParticipantId.of(BigInteger.valueOf(2L));
     Conversation conversation = ConversationFactory.withParticipants(leavingParticipantId,
         stayingParticipantId);
 

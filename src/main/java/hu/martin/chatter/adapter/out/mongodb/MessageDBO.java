@@ -4,13 +4,14 @@ import hu.martin.chatter.domain.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 @Document(collection = "messages")
 public class MessageDBO {
 
     @Id
-    Long id;
+    BigInteger id;
 
     Sender senderId;
 
@@ -20,11 +21,11 @@ public class MessageDBO {
 
     String statusFlag;
 
-    public Long getId() {
+    public BigInteger getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(BigInteger id) {
         this.id = id;
     }
 

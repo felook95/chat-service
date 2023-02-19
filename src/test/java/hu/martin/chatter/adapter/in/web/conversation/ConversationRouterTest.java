@@ -1,18 +1,7 @@
 package hu.martin.chatter.adapter.in.web.conversation;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import hu.martin.chatter.application.ConversationService;
-import hu.martin.chatter.domain.Conversation;
-import hu.martin.chatter.domain.ConversationFactory;
-import hu.martin.chatter.domain.ConversationId;
-import hu.martin.chatter.domain.CreatedDateTime;
-import hu.martin.chatter.domain.Message;
-import hu.martin.chatter.domain.MessageFactory;
-import hu.martin.chatter.domain.ParticipantId;
-import java.time.LocalDateTime;
+import hu.martin.chatter.domain.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,6 +10,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.math.BigInteger;
+import java.time.LocalDateTime;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class ConversationRouterTest {
@@ -44,7 +40,7 @@ class ConversationRouterTest {
   @Test
   void findConversationByIdReturnsFoundDTO() {
     Conversation conversation = ConversationFactory.withDefaults();
-    Long conversationId = conversation.getId().id();
+    BigInteger conversationId = conversation.getId().id();
     when(conversationService.findConversationById(any())).thenReturn(Mono.just(conversation));
 
     client.get().uri("/conversation/" + conversationId).exchange().expectStatus().isOk()
@@ -59,8 +55,8 @@ class ConversationRouterTest {
 
   @Test
   void joinConversationReturnsDTOWithTheJoinedParticipants() {
-    ConversationId conversationId = ConversationId.of(1L);
-    ParticipantId participantId = ParticipantId.of(123L);
+    ConversationId conversationId = ConversationId.of(BigInteger.valueOf(1L));
+    ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(123L));
     when(conversationService.joinParticipantTo(conversationId, participantId)).thenReturn(
         Mono.just(ConversationFactory.withParticipants(participantId)));
 

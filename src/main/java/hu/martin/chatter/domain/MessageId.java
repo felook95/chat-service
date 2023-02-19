@@ -1,8 +1,10 @@
 package hu.martin.chatter.domain;
 
-public record MessageId(Long id) {
+import java.math.BigInteger;
 
-  public static MessageId of(Long id) {
+public record MessageId(BigInteger id) {
+
+  public static MessageId of(BigInteger id) {
     return new MessageId(id);
   }
 }

@@ -2,14 +2,16 @@ package hu.martin.chatter.adapter.out.mongodb;
 
 import hu.martin.chatter.domain.MessageId;
 
+import java.math.BigInteger;
+
 public class SentMessage {
 
-  Long id;
+  BigInteger id;
 
   public SentMessage() {
   }
 
-  public SentMessage(Long id) {
+  public SentMessage(BigInteger id) {
     this.id = id;
   }
 
