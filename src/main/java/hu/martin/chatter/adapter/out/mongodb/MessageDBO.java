@@ -21,6 +21,16 @@ public class MessageDBO {
 
     String statusFlag;
 
+    public static MessageDBO from(Message message) {
+        MessageDBO messageDBO = new MessageDBO();
+        messageDBO.setId(message.id() == null ? null : message.id().id());
+        messageDBO.setSenderId(Sender.fromParticipantId(message.sender()));
+        messageDBO.setContent(message.content().content());
+        messageDBO.setCreatedAt(message.createdDateTime().createdDateTime());
+        messageDBO.setStatusFlag(message.statusFlag().name());
+        return messageDBO;
+    }
+
     public BigInteger getId() {
         return id;
     }
@@ -59,16 +69,6 @@ public class MessageDBO {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public static MessageDBO from(Message message) {
-        MessageDBO messageDBO = new MessageDBO();
-        messageDBO.setId(message.id() == null ? null : message.id().id());
-        messageDBO.setSenderId(Sender.fromParticipantId(message.sender()));
-        messageDBO.setContent(message.content().content());
-        messageDBO.setCreatedAt(message.createdDateTime().createdDateTime());
-        messageDBO.setStatusFlag(message.statusFlag().name());
-        return messageDBO;
     }
 
     public Message asMessage() {

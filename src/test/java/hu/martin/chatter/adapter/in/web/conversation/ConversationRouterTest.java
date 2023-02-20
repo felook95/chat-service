@@ -21,92 +21,92 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class ConversationRouterTest {
 
-  @Autowired
-  private WebTestClient client;
+    @MockBean
+    private ConversationService conversationService;
 
-  @MockBean
-  ConversationService conversationService;
+    @Autowired
+    private WebTestClient client;
 
-  @Test
-  void startConversationReturnsConversationDTO() {
-    when(conversationService.startConversation()).thenReturn(
-        Mono.just(ConversationFactory.withDefaults()));
+    @Test
+    void startConversationReturnsConversationDTO() {
+        when(conversationService.startConversation()).thenReturn(
+                Mono.just(ConversationFactory.withDefaults()));
 
-    client.post().uri("/conversation").exchange().expectStatus().isOk().expectBody()
-        .jsonPath("$.id").isNotEmpty().jsonPath("$.participantIds").isEmpty()
-        .jsonPath("$.messageIds").isEmpty();
-  }
+        client.post().uri("/conversation").exchange().expectStatus().isOk().expectBody()
+                .jsonPath("$.id").isNotEmpty().jsonPath("$.participantIds").isEmpty()
+                .jsonPath("$.messageIds").isEmpty();
+    }
 
-  @Test
-  void findConversationByIdReturnsFoundDTO() {
-    Conversation conversation = ConversationFactory.withDefaults();
-    BigInteger conversationId = conversation.getId().id();
-    when(conversationService.findConversationById(any())).thenReturn(Mono.just(conversation));
+    @Test
+    void findConversationByIdReturnsFoundDTO() {
+        Conversation conversation = ConversationFactory.withDefaults();
+        BigInteger conversationId = conversation.getId().id();
+        when(conversationService.findConversationById(any())).thenReturn(Mono.just(conversation));
 
-    client.get().uri("/conversation/" + conversationId).exchange().expectStatus().isOk()
-        .expectBody().json("""
-            {
-               "id":%s,
-               "participantIds":[],
-               "messageIds":[]
-            }
-            """.formatted(conversationId));
-  }
+        client.get().uri("/conversation/" + conversationId).exchange().expectStatus().isOk()
+                .expectBody().json("""
+                        {
+                           "id":%s,
+                           "participantIds":[],
+                           "messageIds":[]
+                        }
+                        """.formatted(conversationId));
+    }
 
-  @Test
-  void joinConversationReturnsDTOWithTheJoinedParticipants() {
-    ConversationId conversationId = ConversationId.of(BigInteger.valueOf(1L));
-    ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(123L));
-    when(conversationService.joinParticipantTo(conversationId, participantId)).thenReturn(
-        Mono.just(ConversationFactory.withParticipants(participantId)));
+    @Test
+    void joinConversationReturnsDTOWithTheJoinedParticipants() {
+        ConversationId conversationId = ConversationId.of(BigInteger.valueOf(1L));
+        ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(123L));
+        when(conversationService.joinParticipantTo(conversationId, participantId)).thenReturn(
+                Mono.just(ConversationFactory.withParticipants(participantId)));
 
-    client.post()
-        .uri("/conversation/" + conversationId.id() + "/participants/" + participantId.id())
-        .exchange()
-        .expectStatus().isOk().expectBody().jsonPath("$.participantIds[0]")
-        .isEqualTo(participantId.id());
-  }
+        client.post()
+                .uri("/conversation/" + conversationId.id() + "/participants/" + participantId.id())
+                .exchange()
+                .expectStatus().isOk().expectBody().jsonPath("$.participantIds[0]")
+                .isEqualTo(participantId.id());
+    }
 
-  @Test
-  void sendingMessageToConversationReturnsMessageDTO() {
-    Message message = MessageFactory.defaultWIthCreatedDateTimeOf(
-        CreatedDateTime.of(LocalDateTime.parse("2022-11-03T18:27:40.005661434")));
-    when(conversationService.receiveAndSendMessageTo(any(), any())).thenReturn(Mono.just(message));
-    MessageDTO messageDTO = MessageDTO.from(message);
+    @Test
+    void sendingMessageToConversationReturnsMessageDTO() {
+        Message message = MessageFactory.defaultWIthCreatedDateTimeOf(
+                CreatedDateTime.of(LocalDateTime.parse("2022-11-03T18:27:40.005661434")));
+        when(conversationService.receiveAndSendMessageTo(any(), any())).thenReturn(Mono.just(message));
+        MessageDTO messageDTO = MessageDTO.from(message);
 
-    client.post().uri("/conversation/1/messages")
-        .body(Mono.just(messageDTO), MessageDTO.class).exchange().expectBody().json("""
-            {
-               "id":1,
-               "senderId":1,
-               "content":"",
-               "createdDateTime":"2022-11-03T18:27:40.005661434"
-            }
-            """);
-  }
+        client.post().uri("/conversation/1/messages")
+                .body(Mono.just(messageDTO), MessageDTO.class).exchange().expectBody().json("""
+                        {
+                           "id":1,
+                           "senderId":1,
+                           "content":"",
+                           "createdDateTime":"2022-11-03T18:27:40.005661434"
+                        }
+                        """);
+    }
 
-  @Test
-  void storedMessagesCanBeRetrievedFromConversation() {
-    CreatedDateTime createdDateTime = CreatedDateTime.of(
-        LocalDateTime.parse("2022-11-03T18:38:20.005661434"));
-    Message message = MessageFactory.defaultWIthCreatedDateTimeOf(createdDateTime);
-    when(conversationService.messagesFrom(any())).thenReturn(Flux.just(message));
+    @Test
+    void storedMessagesCanBeRetrievedFromConversation() {
+        CreatedDateTime createdDateTime = CreatedDateTime.of(
+                LocalDateTime.parse("2022-11-03T18:38:20.005661434"));
+        Message message = MessageFactory.defaultWIthCreatedDateTimeOf(createdDateTime);
+        when(conversationService.messagesFrom(any())).thenReturn(Flux.just(message));
 
-    client.get().uri("/conversation/1/messages").exchange().expectBody()
-        .json("""
-            [{"senderId":1,"content":"","createdDateTime":"2022-11-03T18:38:20.005661434"}]
-            """);
-  }
+        client.get().uri("/conversation/1/messages").exchange().expectBody()
+                .json("""
+                        [{"senderId":1,"content":"","createdDateTime":"2022-11-03T18:38:20.005661434"}]
+                        """);
+    }
 
-  @Test
-  void verifyCallToRemoveFromConversationIsCalledOnParticipantDelete() {
-    when(conversationService.removeFromConversation(any(),any())).thenReturn(Mono.empty());
+    @Test
+    void verifyCallToRemoveFromConversationIsCalledOnParticipantDelete() {
+        when(conversationService.removeFromConversation(any(), any())).thenReturn(Mono.empty());
 
-    client.delete()
-        .uri("/conversation/1/participants/1")
-        .exchange().expectStatus().isOk();
+        client.delete()
+                .uri("/conversation/1/participants/1")
+                .exchange().expectStatus().isOk();
 
-    verify(conversationService).removeFromConversation(any(), any());
-  }
+        verify(conversationService).removeFromConversation(any(), any());
+    }
 
 }

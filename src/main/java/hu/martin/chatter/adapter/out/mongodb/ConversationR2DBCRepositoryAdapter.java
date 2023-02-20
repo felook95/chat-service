@@ -9,23 +9,23 @@ import reactor.core.publisher.Mono;
 @Repository
 public class ConversationR2DBCRepositoryAdapter implements ConversationRepository {
 
-  private final ConversationReactiveCrudRepository conversationRepository;
+    private final ConversationReactiveCrudRepository conversationRepository;
 
-  public ConversationR2DBCRepositoryAdapter(
-      ConversationReactiveCrudRepository conversationRepository) {
-    this.conversationRepository = conversationRepository;
-  }
+    public ConversationR2DBCRepositoryAdapter(
+            ConversationReactiveCrudRepository conversationRepository) {
+        this.conversationRepository = conversationRepository;
+    }
 
-  @Override
-  public Mono<Conversation> findById(ConversationId id) {
-    return conversationRepository.findById(id.id())
-            .map(ConversationDBO::asConversation);
-  }
+    @Override
+    public Mono<Conversation> findById(ConversationId id) {
+        return conversationRepository.findById(id.id())
+                .map(ConversationDBO::asConversation);
+    }
 
-  @Override
-  public Mono<Conversation> save(Conversation conversation) {
-    ConversationDBO conversationDBO = ConversationDBO.from(conversation);
-    return conversationRepository.save(conversationDBO)
-        .map(ConversationDBO::asConversation);
-  }
+    @Override
+    public Mono<Conversation> save(Conversation conversation) {
+        ConversationDBO conversationDBO = ConversationDBO.from(conversation);
+        return conversationRepository.save(conversationDBO)
+                .map(ConversationDBO::asConversation);
+    }
 }

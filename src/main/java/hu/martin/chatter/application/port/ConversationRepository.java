@@ -6,7 +6,7 @@ import reactor.core.publisher.Mono;
 
 public interface ConversationRepository {
 
-  Mono<Conversation> findById(ConversationId id);
+    Mono<Conversation> findById(ConversationId id);
 
-  Mono<Conversation> save(Conversation conversation);
+    Mono<Conversation> save(Conversation conversation);
 }

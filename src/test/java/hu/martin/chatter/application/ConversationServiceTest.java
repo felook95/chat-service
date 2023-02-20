@@ -22,254 +22,254 @@ import static org.mockito.Mockito.verify;
 @Tag("unitTest")
 class ConversationServiceTest {
 
-  @Test
-  void createConversation() {
-    ConversationService conversationService = ConversationServiceFactory.withDefaults();
+    private static Message receiveDefaultMessage(ConversationService conversationService) {
+        ParticipantId senderId = ParticipantId.of(BigInteger.valueOf(1L));
+        MessageContent messageContent = MessageContent.of("");
+        CreatedDateTime createdDateTime = CreatedDateTime.of(LocalDateTime.now());
+        return conversationService.receiveMessage(
+                new Message(senderId, messageContent, createdDateTime)).block();
+    }
 
-    Conversation conversation = conversationService.startConversation().block();
+    private static ConversationService conversationServiceWithParticipantInConversation(
+            ConversationId conversationId, ParticipantId participantId) {
+        ConversationRepository conversationRepository = new InMemoryConversationRepository();
+        Conversation conversation = ConversationFactory.withParticipants(participantId);
+        conversation.setId(conversationId);
+        conversationRepository.save(conversation);
+        return ConversationServiceFactory.withConversationRepository(conversationRepository);
+    }
 
-    assertThat(conversation).isNotNull();
-  }
+    @Test
+    void createConversation() {
+        ConversationService conversationService = ConversationServiceFactory.withDefaults();
 
-  @Test
-  void createConversationReturnsConversationWithId() {
-    ConversationService conversationService = ConversationServiceFactory.withDefaults();
+        Conversation conversation = conversationService.startConversation().block();
 
-    Conversation conversation = conversationService.startConversation().block();
+        assertThat(conversation).isNotNull();
+    }
 
-    assertThat(conversation.getId()).isNotNull();
-  }
+    @Test
+    void createConversationReturnsConversationWithId() {
+        ConversationService conversationService = ConversationServiceFactory.withDefaults();
 
-  @Test
-  void multipleCreateConversationCallReturnsConversationsWithDifferentId() {
-    ConversationService conversationService = ConversationServiceFactory.withDefaults();
+        Conversation conversation = conversationService.startConversation().block();
 
-    Conversation conversation1 = conversationService.startConversation().block();
-    Conversation conversation2 = conversationService.startConversation().block();
+        assertThat(conversation.getId()).isNotNull();
+    }
 
-    assertThat(conversation1.getId()).isNotEqualTo(conversation2.getId());
-  }
+    @Test
+    void multipleCreateConversationCallReturnsConversationsWithDifferentId() {
+        ConversationService conversationService = ConversationServiceFactory.withDefaults();
 
-  @Test
-  void conversationServiceFindsCreatedConversation() {
-    ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    Conversation createdConversation = conversationService.startConversation().block();
+        Conversation conversation1 = conversationService.startConversation().block();
+        Conversation conversation2 = conversationService.startConversation().block();
 
-    Conversation foundConversation = conversationService.findConversationById(
-        createdConversation.getId()).block();
+        assertThat(conversation1.getId()).isNotEqualTo(conversation2.getId());
+    }
 
-    assertThat(createdConversation).isEqualTo(foundConversation);
-  }
+    @Test
+    void conversationServiceFindsCreatedConversation() {
+        ConversationService conversationService = ConversationServiceFactory.withDefaults();
+        Conversation createdConversation = conversationService.startConversation().block();
 
-  @Test
-  void notFoundConversationThrowsConversationNotFoundException() {
-    ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    ConversationId conversationId = ConversationId.of(BigInteger.valueOf(1L));
+        Conversation foundConversation = conversationService.findConversationById(
+                createdConversation.getId()).block();
 
-    Mono<Conversation> conversationByIdMono = conversationService.findConversationById(conversationId);
-    assertThatThrownBy(conversationByIdMono::block).isInstanceOf(
-        ConversationNotFoundException.class);
-  }
+        assertThat(createdConversation).isEqualTo(foundConversation);
+    }
 
-  @Test
-  void joinParticipantAddsParticipantToConversation() {
-    ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    Conversation conversation = conversationService.startConversation().block();
-    ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
+    @Test
+    void notFoundConversationThrowsConversationNotFoundException() {
+        ConversationService conversationService = ConversationServiceFactory.withDefaults();
+        ConversationId conversationId = ConversationId.of(BigInteger.valueOf(1L));
 
-    conversationService.joinParticipantTo(conversation.getId(), participantId).block();
+        Mono<Conversation> conversationByIdMono = conversationService.findConversationById(conversationId);
+        assertThatThrownBy(conversationByIdMono::block).isInstanceOf(
+                ConversationNotFoundException.class);
+    }
 
-    Conversation foundConversation = conversationService.findConversationById(conversation.getId())
-        .block();
-    assertThat(foundConversation.participants()).containsOnly(participantId);
-  }
+    @Test
+    void joinParticipantAddsParticipantToConversation() {
+        ConversationService conversationService = ConversationServiceFactory.withDefaults();
+        Conversation conversation = conversationService.startConversation().block();
+        ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
 
-  @Test
-  void receivedMessageWithContentStoresMessage() {
-    ConversationService conversationService = ConversationServiceFactory.withDefaults();
+        conversationService.joinParticipantTo(conversation.getId(), participantId).block();
 
-    Message message = receiveDefaultMessage(conversationService);
+        Conversation foundConversation = conversationService.findConversationById(conversation.getId())
+                .block();
+        assertThat(foundConversation.participants()).containsOnly(participantId);
+    }
 
-    Message foundMessage = conversationService.findMessageById(message.id()).block();
-    assertThat(message).isEqualTo(foundMessage);
-  }
+    @Test
+    void receivedMessageWithContentStoresMessage() {
+        ConversationService conversationService = ConversationServiceFactory.withDefaults();
 
-  @Test
-  void receiveMessageStoresMessageContent() {
-    ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    ParticipantId senderId = ParticipantId.of(BigInteger.valueOf(1L));
-    MessageContent messageContent = MessageContent.of("Test message");
-    CreatedDateTime createdDateTime = CreatedDateTime.of(LocalDateTime.now().plusNanos(123456));
+        Message message = receiveDefaultMessage(conversationService);
 
-    MessageId storedMessageId = conversationService.receiveMessage(
-        new Message(senderId, messageContent, createdDateTime)).block().id();
+        Message foundMessage = conversationService.findMessageById(message.id()).block();
+        assertThat(message).isEqualTo(foundMessage);
+    }
 
-    Message foundMessage = conversationService.findMessageById(storedMessageId).block();
+    @Test
+    void receiveMessageStoresMessageContent() {
+        ConversationService conversationService = ConversationServiceFactory.withDefaults();
+        ParticipantId senderId = ParticipantId.of(BigInteger.valueOf(1L));
+        MessageContent messageContent = MessageContent.of("Test message");
+        CreatedDateTime createdDateTime = CreatedDateTime.of(LocalDateTime.now().plusNanos(123456));
 
-    assertThat(foundMessage.createdDateTime()).isEqualTo(createdDateTime);
-    assertThat(foundMessage.content()).isEqualTo(messageContent);
-  }
+        MessageId storedMessageId = conversationService.receiveMessage(
+                new Message(senderId, messageContent, createdDateTime)).block().id();
 
-  @Test
-  void notFoundMessageThrowsMessageNotFoundException() {
-    ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    MessageId messageId = MessageId.of(BigInteger.valueOf(1L));
+        Message foundMessage = conversationService.findMessageById(storedMessageId).block();
 
-    Mono<Message> messageByIdMono = conversationService.findMessageById(messageId);
-    assertThatThrownBy(messageByIdMono::block).isInstanceOf(
-        MessageNotFoundException.class);
-  }
+        assertThat(foundMessage.createdDateTime()).isEqualTo(createdDateTime);
+        assertThat(foundMessage.content()).isEqualTo(messageContent);
+    }
 
-  @Test
-  void sentMessageAddingToConversation() {
-    ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    Conversation conversation = conversationService.startConversation().block();
-    Message message = receiveDefaultMessage(conversationService);
-    ParticipantId senderId = ParticipantId.of(BigInteger.valueOf(1L));
-    conversation.joinedBy(senderId);
+    @Test
+    void notFoundMessageThrowsMessageNotFoundException() {
+        ConversationService conversationService = ConversationServiceFactory.withDefaults();
+        MessageId messageId = MessageId.of(BigInteger.valueOf(1L));
 
-    conversationService.sendMessageTo(message.id(), conversation.getId()).block();
+        Mono<Message> messageByIdMono = conversationService.findMessageById(messageId);
+        assertThatThrownBy(messageByIdMono::block).isInstanceOf(
+                MessageNotFoundException.class);
+    }
 
-    Conversation foundConversation = conversationService.findConversationById(conversation.getId())
-        .block();
-    assertThat(foundConversation.messages()).containsOnly(message.id());
-  }
+    @Test
+    void sentMessageAddingToConversation() {
+        ConversationService conversationService = ConversationServiceFactory.withDefaults();
+        Conversation conversation = conversationService.startConversation().block();
+        Message message = receiveDefaultMessage(conversationService);
+        ParticipantId senderId = ParticipantId.of(BigInteger.valueOf(1L));
+        conversation.joinedBy(senderId);
 
-  @Test
-  void verifyReceiveAndSendMessageCallsReceiveMessageAndSendMessageTo() {
-    ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    ConversationId conversationId = conversationService.startConversation().block().getId();
-    ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
-    conversationService.joinParticipantTo(conversationId, participantId).block();
-    conversationService = spy(conversationService);
-    Message message = MessageFactory.defaultWithSender(participantId);
+        conversationService.sendMessageTo(message.id(), conversation.getId()).block();
 
-    conversationService.receiveAndSendMessageTo(conversationId, message).block();
+        Conversation foundConversation = conversationService.findConversationById(conversation.getId())
+                .block();
+        assertThat(foundConversation.messages()).containsOnly(message.id());
+    }
 
-    verify(conversationService).receiveMessage(any());
-    verify(conversationService).sendMessageTo(any(), any());
-  }
+    @Test
+    void verifyReceiveAndSendMessageCallsReceiveMessageAndSendMessageTo() {
+        ConversationService conversationService = ConversationServiceFactory.withDefaults();
+        ConversationId conversationId = conversationService.startConversation().block().getId();
+        ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
+        conversationService.joinParticipantTo(conversationId, participantId).block();
+        conversationService = spy(conversationService);
+        Message message = MessageFactory.defaultWithSender(participantId);
 
-  @Test
-  void receiveAndSendMessageReturnsSavedMessage() {
-    ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    ConversationId conversationId = conversationService.startConversation().block().getId();
-    ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
-    conversationService.joinParticipantTo(conversationId, participantId).block();
-    Message message = MessageFactory.defaultWithSender(participantId);
-    message.setId(null);
+        conversationService.receiveAndSendMessageTo(conversationId, message).block();
 
-    Message savedMessage = conversationService.receiveAndSendMessageTo(conversationId, message)
-        .block();
+        verify(conversationService).receiveMessage(any());
+        verify(conversationService).sendMessageTo(any(), any());
+    }
 
-    assertThat(savedMessage).isNotNull();
-    assertThat(savedMessage.id()).isNotNull();
-  }
+    @Test
+    void receiveAndSendMessageReturnsSavedMessage() {
+        ConversationService conversationService = ConversationServiceFactory.withDefaults();
+        ConversationId conversationId = conversationService.startConversation().block().getId();
+        ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
+        conversationService.joinParticipantTo(conversationId, participantId).block();
+        Message message = MessageFactory.defaultWithSender(participantId);
+        message.setId(null);
 
-  private static Message receiveDefaultMessage(ConversationService conversationService) {
-    ParticipantId senderId = ParticipantId.of(BigInteger.valueOf(1L));
-    MessageContent messageContent = MessageContent.of("");
-    CreatedDateTime createdDateTime = CreatedDateTime.of(LocalDateTime.now());
-    return conversationService.receiveMessage(
-        new Message(senderId, messageContent, createdDateTime)).block();
-  }
+        Message savedMessage = conversationService.receiveAndSendMessageTo(conversationId, message)
+                .block();
 
-  @Test
-  void messageSentByNonParticipantThrowsException() {
-    ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    Conversation conversation = conversationService.startConversation().block();
-    Message message = receiveDefaultMessage(conversationService);
-    MessageId messageId = message.id();
-    ConversationId conversationId = conversation.getId();
+        assertThat(savedMessage).isNotNull();
+        assertThat(savedMessage.id()).isNotNull();
+    }
 
-    Mono<Void> sendMessageToMono = conversationService.sendMessageTo(messageId, conversationId);
-    assertThatThrownBy(
-        sendMessageToMono::block).isInstanceOf(
-        IllegalArgumentException.class);
-  }
+    @Test
+    void messageSentByNonParticipantThrowsException() {
+        ConversationService conversationService = ConversationServiceFactory.withDefaults();
+        Conversation conversation = conversationService.startConversation().block();
+        Message message = receiveDefaultMessage(conversationService);
+        MessageId messageId = message.id();
+        ConversationId conversationId = conversation.getId();
 
-  @Test
-  void deletedMessageAppearsInDeletedMessages() {
-    ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    MessageId messageId = receiveDefaultMessage(conversationService).id();
+        Mono<Void> sendMessageToMono = conversationService.sendMessageTo(messageId, conversationId);
+        assertThatThrownBy(
+                sendMessageToMono::block).isInstanceOf(
+                IllegalArgumentException.class);
+    }
 
-    conversationService.deleteMessage(messageId).block();
+    @Test
+    void deletedMessageAppearsInDeletedMessages() {
+        ConversationService conversationService = ConversationServiceFactory.withDefaults();
+        MessageId messageId = receiveDefaultMessage(conversationService).id();
 
-    Message foundMessage = conversationService.findMessageById(messageId).block();
-    assertThat(foundMessage.statusFlag()).isEqualTo(MessageStatus.DELETED);
-  }
+        conversationService.deleteMessage(messageId).block();
 
-  @Test
-  void messagesForConversationReturnsAllMessages() {
-    ConversationRepository conversationRepository = new InMemoryConversationRepository();
-    Conversation conversation = ConversationFactory.withDefaults();
-    conversation.messageSent(MessageId.of(BigInteger.valueOf(1L)));
-    conversation.messageSent(MessageId.of(BigInteger.valueOf(2L)));
-    conversationRepository.save(conversation);
-    MessageRepository messageRepository = new InMemoryMessageRepository();
-    messageRepository.save(MessageFactory.defaultWIthIdOf(MessageId.of(BigInteger.valueOf(1L))));
-    messageRepository.save(MessageFactory.defaultWIthIdOf(MessageId.of(BigInteger.valueOf(2L))));
-    ConversationService conversationService = ConversationServiceFactory.with(
-        conversationRepository, messageRepository);
+        Message foundMessage = conversationService.findMessageById(messageId).block();
+        assertThat(foundMessage.statusFlag()).isEqualTo(MessageStatus.DELETED);
+    }
 
-    Collection<Message> messagesInConversation = conversationService.messagesFrom(
-        conversation.getId()).collectList().block();
+    @Test
+    void messagesForConversationReturnsAllMessages() {
+        ConversationRepository conversationRepository = new InMemoryConversationRepository();
+        Conversation conversation = ConversationFactory.withDefaults();
+        conversation.messageSent(MessageId.of(BigInteger.valueOf(1L)));
+        conversation.messageSent(MessageId.of(BigInteger.valueOf(2L)));
+        conversationRepository.save(conversation);
+        MessageRepository messageRepository = new InMemoryMessageRepository();
+        messageRepository.save(MessageFactory.defaultWIthIdOf(MessageId.of(BigInteger.valueOf(1L))));
+        messageRepository.save(MessageFactory.defaultWIthIdOf(MessageId.of(BigInteger.valueOf(2L))));
+        ConversationService conversationService = ConversationServiceFactory.with(
+                conversationRepository, messageRepository);
 
-    assertThat(messagesInConversation).hasSize(2);
-  }
+        Collection<Message> messagesInConversation = conversationService.messagesFrom(
+                conversation.getId()).collectList().block();
 
-  @Test
-  void conversationReturnsMessagesInChronologicalOrder() {
-    ConversationService conversationService = ConversationServiceFactory.withDefaults();
-    ConversationId conversationId = conversationService.startConversation().block().getId();
-    CreatedDateTime oldestDateTime = CreatedDateTime.of(LocalDateTime.now().plusDays(3));
-    CreatedDateTime mostRecentDateTime = CreatedDateTime.of(LocalDateTime.now().plusDays(0));
-    CreatedDateTime middleDateTime = CreatedDateTime.of(LocalDateTime.now().plusDays(2));
-    saveRandomMessageToConversationWithCreatedDateTime(conversationService, oldestDateTime,
-        conversationId);
-    saveRandomMessageToConversationWithCreatedDateTime(conversationService, mostRecentDateTime,
-        conversationId);
-    saveRandomMessageToConversationWithCreatedDateTime(conversationService, middleDateTime,
-        conversationId);
+        assertThat(messagesInConversation).hasSize(2);
+    }
 
-    Collection<Message> orderedMessages = conversationService.messagesByChronologicalOrderFrom(
-        conversationId).collectList().block();
+    @Test
+    void conversationReturnsMessagesInChronologicalOrder() {
+        ConversationService conversationService = ConversationServiceFactory.withDefaults();
+        ConversationId conversationId = conversationService.startConversation().block().getId();
+        CreatedDateTime oldestDateTime = CreatedDateTime.of(LocalDateTime.now().plusDays(3));
+        CreatedDateTime mostRecentDateTime = CreatedDateTime.of(LocalDateTime.now().plusDays(0));
+        CreatedDateTime middleDateTime = CreatedDateTime.of(LocalDateTime.now().plusDays(2));
+        saveRandomMessageToConversationWithCreatedDateTime(conversationService, oldestDateTime,
+                conversationId);
+        saveRandomMessageToConversationWithCreatedDateTime(conversationService, mostRecentDateTime,
+                conversationId);
+        saveRandomMessageToConversationWithCreatedDateTime(conversationService, middleDateTime,
+                conversationId);
 
-    assertThat(orderedMessages).extracting(Message::createdDateTime)
-        .containsExactly(mostRecentDateTime, middleDateTime, oldestDateTime);
-  }
+        Collection<Message> orderedMessages = conversationService.messagesByChronologicalOrderFrom(
+                conversationId).collectList().block();
 
-  private void saveRandomMessageToConversationWithCreatedDateTime(
-      ConversationService conversationService, CreatedDateTime createdDateTime,
-      ConversationId conversationId) {
-    ParticipantId senderId = ParticipantId.of(BigInteger.valueOf(1L));
-    MessageContent messageContent = MessageContent.of("");
-    conversationService.joinParticipantTo(conversationId, senderId).block();
-    MessageId savedMessageId = conversationService.receiveMessage(
-        new Message(senderId, messageContent, createdDateTime)).block().id();
-    conversationService.sendMessageTo(savedMessageId, conversationId).block();
-  }
+        assertThat(orderedMessages).extracting(Message::createdDateTime)
+                .containsExactly(mostRecentDateTime, middleDateTime, oldestDateTime);
+    }
 
-  @Test
-  void leavingConversationRemovesParticipantFromConversation() {
-    ConversationId conversationId = ConversationId.of(BigInteger.valueOf(1L));
-    ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
-    ConversationService conversationService = conversationServiceWithParticipantInConversation(
-        conversationId, participantId);
+    private void saveRandomMessageToConversationWithCreatedDateTime(
+            ConversationService conversationService, CreatedDateTime createdDateTime,
+            ConversationId conversationId) {
+        ParticipantId senderId = ParticipantId.of(BigInteger.valueOf(1L));
+        MessageContent messageContent = MessageContent.of("");
+        conversationService.joinParticipantTo(conversationId, senderId).block();
+        MessageId savedMessageId = conversationService.receiveMessage(
+                new Message(senderId, messageContent, createdDateTime)).block().id();
+        conversationService.sendMessageTo(savedMessageId, conversationId).block();
+    }
 
-    conversationService.removeFromConversation(conversationId, participantId).block();
+    @Test
+    void leavingConversationRemovesParticipantFromConversation() {
+        ConversationId conversationId = ConversationId.of(BigInteger.valueOf(1L));
+        ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
+        ConversationService conversationService = conversationServiceWithParticipantInConversation(
+                conversationId, participantId);
 
-    Conversation conversation = conversationService.findConversationById(conversationId).block();
-    assertThat(conversation.hasParticipant(participantId)).isFalse();
+        conversationService.removeFromConversation(conversationId, participantId).block();
 
-  }
+        Conversation conversation = conversationService.findConversationById(conversationId).block();
+        assertThat(conversation.hasParticipant(participantId)).isFalse();
 
-  private static ConversationService conversationServiceWithParticipantInConversation(
-      ConversationId conversationId, ParticipantId participantId) {
-    ConversationRepository conversationRepository = new InMemoryConversationRepository();
-    Conversation conversation = ConversationFactory.withParticipants(participantId);
-    conversation.setId(conversationId);
-    conversationRepository.save(conversation);
-    return ConversationServiceFactory.withConversationRepository(conversationRepository);
-  }
+    }
 }

@@ -5,8 +5,8 @@ import hu.martin.chatter.application.port.MessageRepository;
 
 public class MessageServiceFactory {
 
-  public static MessageService withDefaults() {
-    MessageRepository messageRepository = new InMemoryMessageRepository();
-    return new DefaultMessageService(messageRepository);
-  }
+    public static MessageService withDefaults() {
+        MessageRepository messageRepository = new InMemoryMessageRepository();
+        return new DefaultMessageService(messageRepository);
+    }
 }

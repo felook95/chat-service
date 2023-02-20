@@ -4,7 +4,7 @@ import java.math.BigInteger;
 
 public record ConversationId(BigInteger id) {
 
-  public static ConversationId of(BigInteger id) {
-    return new ConversationId(id);
-  }
+    public static ConversationId of(BigInteger id) {
+        return new ConversationId(id);
+    }
 }

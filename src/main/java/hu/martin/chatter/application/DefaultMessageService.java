@@ -8,23 +8,23 @@ import reactor.core.publisher.Mono;
 
 public class DefaultMessageService implements MessageService {
 
-  private final MessageRepository messageRepository;
+    private final MessageRepository messageRepository;
 
-  public DefaultMessageService(MessageRepository messageRepository) {
-    this.messageRepository = messageRepository;
-  }
+    public DefaultMessageService(MessageRepository messageRepository) {
+        this.messageRepository = messageRepository;
+    }
 
-  @Override
-  public Mono<Message> receiveMessage(Message message) {
-    return messageRepository.save(message);
-  }
+    @Override
+    public Mono<Message> receiveMessage(Message message) {
+        return messageRepository.save(message);
+    }
 
-  @Override
-  public Mono<Message> editMessageContent(MessageId id, MessageContent newContent) {
-    return messageRepository.findById(id).switchIfEmpty(Mono.error(MessageNotFoundException::new))
-        .map(message -> {
-          message.changeContentTo(newContent);
-          return message;
-        }).flatMap(messageRepository::save);
-  }
+    @Override
+    public Mono<Message> editMessageContent(MessageId id, MessageContent newContent) {
+        return messageRepository.findById(id).switchIfEmpty(Mono.error(MessageNotFoundException::new))
+                .map(message -> {
+                    message.changeContentTo(newContent);
+                    return message;
+                }).flatMap(messageRepository::save);
+    }
 }

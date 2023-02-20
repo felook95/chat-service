@@ -12,69 +12,69 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @Tag("unitTest")
 class MessageTest {
 
-  @Test
-  void newMessageHasDefaultStatusOfNormal() {
-    Message message = MessageFactory.withDefaults();
+    @Test
+    void newMessageHasDefaultStatusOfNormal() {
+        Message message = MessageFactory.withDefaults();
 
-    assertThat(message.statusFlag()).isEqualTo(MessageStatus.CREATED);
-  }
+        assertThat(message.statusFlag()).isEqualTo(MessageStatus.CREATED);
+    }
 
-  @Test
-  void changeStatusFlagToChangesTheStatusFlag() {
-    Message message = MessageFactory.withDefaults();
+    @Test
+    void changeStatusFlagToChangesTheStatusFlag() {
+        Message message = MessageFactory.withDefaults();
 
-    message.changeStatusFlagTo(MessageStatus.DELETED);
+        message.changeStatusFlagTo(MessageStatus.DELETED);
 
-    assertThat(message.statusFlag()).isEqualTo(MessageStatus.DELETED);
-  }
+        assertThat(message.statusFlag()).isEqualTo(MessageStatus.DELETED);
+    }
 
-  @Test
-  void messageStoresContent() {
-    ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
-    MessageContent messageContent = new MessageContent("Test message");
-    Message message = new Message(participantId, messageContent,
-        CreatedDateTime.of(LocalDateTime.now()));
+    @Test
+    void messageStoresContent() {
+        ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
+        MessageContent messageContent = new MessageContent("Test message");
+        Message message = new Message(participantId, messageContent,
+                CreatedDateTime.of(LocalDateTime.now()));
 
-    assertThat(message.content()).isEqualTo(messageContent);
-  }
+        assertThat(message.content()).isEqualTo(messageContent);
+    }
 
-  @Test
-  void editMessageContent() {
-    Message message = MessageFactory.withDefaults();
-    MessageContent newContent = MessageContent.of("Modified content");
+    @Test
+    void editMessageContent() {
+        Message message = MessageFactory.withDefaults();
+        MessageContent newContent = MessageContent.of("Modified content");
 
-    message.changeContentTo(newContent);
+        message.changeContentTo(newContent);
 
-    assertThat(message.content()).isEqualTo(newContent);
-  }
+        assertThat(message.content()).isEqualTo(newContent);
+    }
 
-  @Test
-  void editingMessageContentChangesMessageStatusToEdited() {
-    Message message = MessageFactory.withDefaults();
+    @Test
+    void editingMessageContentChangesMessageStatusToEdited() {
+        Message message = MessageFactory.withDefaults();
 
-    message.changeContentTo(MessageContent.of("Modified content"));
+        message.changeContentTo(MessageContent.of("Modified content"));
 
-    assertThat(message.statusFlag()).isEqualTo(MessageStatus.EDITED);
-  }
+        assertThat(message.statusFlag()).isEqualTo(MessageStatus.EDITED);
+    }
 
-  @Test
-  void editingADeletedMessageThrowsException() {
-    Message message = MessageFactory.withDefaults();
-    message.delete();
+    @Test
+    void editingADeletedMessageThrowsException() {
+        Message message = MessageFactory.withDefaults();
+        message.delete();
 
-    MessageContent modifiedContent = MessageContent.of("Modified content");
-    assertThatThrownBy(() -> message.changeContentTo(modifiedContent)).isInstanceOf(
-        IllegalStateException.class);
-  }
+        MessageContent modifiedContent = MessageContent.of("Modified content");
+        assertThatThrownBy(() -> message.changeContentTo(modifiedContent)).isInstanceOf(
+                IllegalStateException.class);
+    }
 
 
-  @Test
-  void deleteMessageSetsStatusFlagToDeleted() {
-    Message message = MessageFactory.withDefaults();
+    @Test
+    void deleteMessageSetsStatusFlagToDeleted() {
+        Message message = MessageFactory.withDefaults();
 
-    message.delete();
+        message.delete();
 
-    assertThat(message.statusFlag()).isEqualTo(MessageStatus.DELETED);
-  }
+        assertThat(message.statusFlag()).isEqualTo(MessageStatus.DELETED);
+    }
 
 }

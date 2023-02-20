@@ -2,64 +2,64 @@ package hu.martin.chatter.domain;
 
 public class Message {
 
-  private final CreatedDateTime createdDateTime;
-  private MessageId id;
-  private final ParticipantId senderId;
-  private MessageContent content;
-  private MessageStatus statusFlag;
+    private final CreatedDateTime createdDateTime;
+    private final ParticipantId senderId;
+    private MessageId id;
+    private MessageContent content;
+    private MessageStatus statusFlag;
 
-  public Message(ParticipantId senderId, MessageContent content, CreatedDateTime createdDateTime) {
-    this.senderId = senderId;
-    this.content = content;
-    this.statusFlag = MessageStatus.CREATED;
-    this.createdDateTime = createdDateTime;
-  }
-
-  public void changeContentTo(MessageContent content) {
-    assertNotDeleted();
-    this.content = content;
-    edited();
-  }
-
-  private void assertNotDeleted() {
-    if (MessageStatus.DELETED.equals(statusFlag())) {
-      throw new IllegalStateException("Deleted message cannot be edited");
+    public Message(ParticipantId senderId, MessageContent content, CreatedDateTime createdDateTime) {
+        this.senderId = senderId;
+        this.content = content;
+        this.statusFlag = MessageStatus.CREATED;
+        this.createdDateTime = createdDateTime;
     }
-  }
 
-  private void edited() {
-    changeStatusFlagTo(MessageStatus.EDITED);
-  }
+    public void changeContentTo(MessageContent content) {
+        assertNotDeleted();
+        this.content = content;
+        edited();
+    }
 
-  public MessageContent content() {
-    return content;
-  }
+    private void assertNotDeleted() {
+        if (MessageStatus.DELETED.equals(statusFlag())) {
+            throw new IllegalStateException("Deleted message cannot be edited");
+        }
+    }
 
-  public void delete() {
-    statusFlag = MessageStatus.DELETED;
-  }
+    private void edited() {
+        changeStatusFlagTo(MessageStatus.EDITED);
+    }
 
-  public MessageStatus statusFlag() {
-    return statusFlag;
-  }
+    public MessageContent content() {
+        return content;
+    }
 
-  public MessageId id() {
-    return id;
-  }
+    public void delete() {
+        statusFlag = MessageStatus.DELETED;
+    }
 
-  public void setId(MessageId id) {
-    this.id = id;
-  }
+    public MessageStatus statusFlag() {
+        return statusFlag;
+    }
 
-  public CreatedDateTime createdDateTime() {
-    return createdDateTime;
-  }
+    public MessageId id() {
+        return id;
+    }
 
-  public void changeStatusFlagTo(MessageStatus newStatusFlag) {
-    this.statusFlag = newStatusFlag;
-  }
+    public void setId(MessageId id) {
+        this.id = id;
+    }
 
-  public ParticipantId sender() {
-    return senderId;
-  }
+    public CreatedDateTime createdDateTime() {
+        return createdDateTime;
+    }
+
+    public void changeStatusFlagTo(MessageStatus newStatusFlag) {
+        this.statusFlag = newStatusFlag;
+    }
+
+    public ParticipantId sender() {
+        return senderId;
+    }
 }

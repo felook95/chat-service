@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 
 public interface MessageService {
 
-  Mono<Message> receiveMessage(Message message);
+    Mono<Message> receiveMessage(Message message);
 
-  Mono<Message> editMessageContent(MessageId id, MessageContent newContent);
+    Mono<Message> editMessageContent(MessageId id, MessageContent newContent);
 }

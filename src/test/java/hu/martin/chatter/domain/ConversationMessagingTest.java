@@ -11,28 +11,28 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @Tag("unitTest")
 class ConversationMessagingTest {
 
-  @Test
-  void conversationStartsWithoutMessages() {
-    Conversation conversation = new Conversation();
+    @Test
+    void conversationStartsWithoutMessages() {
+        Conversation conversation = new Conversation();
 
-    assertThat(conversation.messages()).isEmpty();
-  }
+        assertThat(conversation.messages()).isEmpty();
+    }
 
-  @Test
-  void messageStoredInConversation() {
-    Conversation conversation = new Conversation();
-    MessageId messageId = MessageId.of(BigInteger.valueOf(1L));
+    @Test
+    void messageStoredInConversation() {
+        Conversation conversation = new Conversation();
+        MessageId messageId = MessageId.of(BigInteger.valueOf(1L));
 
-    conversation.messageSent(messageId);
+        conversation.messageSent(messageId);
 
-    assertThat(conversation.messages()).containsOnly(messageId);
-  }
+        assertThat(conversation.messages()).containsOnly(messageId);
+    }
 
-  @Test
-  void nullMessageThrowsException() {
-    Conversation conversation = new Conversation();
+    @Test
+    void nullMessageThrowsException() {
+        Conversation conversation = new Conversation();
 
-    assertThatThrownBy(() -> conversation.messageSent(null))
-        .isInstanceOf(IllegalArgumentException.class);
-  }
+        assertThatThrownBy(() -> conversation.messageSent(null))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }

@@ -9,72 +9,72 @@ import java.math.BigInteger;
 
 public class StubConversationServiceForSendingMessage implements ConversationService {
 
-  private final Conversation conversation;
+    private final Conversation conversation;
 
-  public StubConversationServiceForSendingMessage(ConversationId initialConversationsId) {
-    conversation = new Conversation();
-    conversation.setId(initialConversationsId);
-  }
+    public StubConversationServiceForSendingMessage(ConversationId initialConversationsId) {
+        conversation = new Conversation();
+        conversation.setId(initialConversationsId);
+    }
 
-  @Override
-  public Mono<Conversation> startConversation() {
-    return null;
-  }
+    @Override
+    public Mono<Conversation> startConversation() {
+        return null;
+    }
 
-  @Override
-  public Mono<Conversation> findConversationById(ConversationId id) {
-    return Mono.just(conversation);
-  }
+    @Override
+    public Mono<Conversation> findConversationById(ConversationId id) {
+        return Mono.just(conversation);
+    }
 
-  @Override
-  public Mono<Message> findMessageById(MessageId id) {
-    return null;
-  }
+    @Override
+    public Mono<Message> findMessageById(MessageId id) {
+        return null;
+    }
 
-  @Override
-  public Mono<Conversation> joinParticipantTo(ConversationId conversationId,
-      ParticipantId participantId) {
+    @Override
+    public Mono<Conversation> joinParticipantTo(ConversationId conversationId,
+                                                ParticipantId participantId) {
 
-    return null;
-  }
+        return null;
+    }
 
-  @Override
-  public Mono<Message> receiveMessage(Message message) {
-    message.setId(MessageId.of(BigInteger.valueOf(1L)));
-    return Mono.just(message);
-  }
+    @Override
+    public Mono<Message> receiveMessage(Message message) {
+        message.setId(MessageId.of(BigInteger.valueOf(1L)));
+        return Mono.just(message);
+    }
 
-  @Override
-  public Mono<Void> sendMessageTo(MessageId messageId, ConversationId conversationId) {
-    conversation.messageSent(messageId);
-    return null;
-  }
+    @Override
+    public Mono<Void> sendMessageTo(MessageId messageId, ConversationId conversationId) {
+        conversation.messageSent(messageId);
+        return null;
+    }
 
-  @Override
-  public Mono<Message> receiveAndSendMessageTo(ConversationId conversationId, Message message) {
-    return receiveMessage(message).flatMap(
-        receivedMessage -> sendMessageTo(receivedMessage.id(), conversationId).thenReturn(
-            receivedMessage));
-  }
+    @Override
+    public Mono<Message> receiveAndSendMessageTo(ConversationId conversationId, Message message) {
+        return receiveMessage(message).flatMap(
+                receivedMessage -> sendMessageTo(receivedMessage.id(), conversationId).thenReturn(
+                        receivedMessage));
+    }
 
-  @Override
-  public Mono<Void> deleteMessage(MessageId messageId) {
-    return null;
-  }
+    @Override
+    public Mono<Void> deleteMessage(MessageId messageId) {
+        return null;
+    }
 
-  @Override
-  public Flux<Message> messagesFrom(ConversationId conversationId) {
-    return null;
-  }
+    @Override
+    public Flux<Message> messagesFrom(ConversationId conversationId) {
+        return null;
+    }
 
-  @Override
-  public Flux<Message> messagesByChronologicalOrderFrom(ConversationId conversationId) {
-    return null;
-  }
+    @Override
+    public Flux<Message> messagesByChronologicalOrderFrom(ConversationId conversationId) {
+        return null;
+    }
 
-  @Override
-  public Mono<Void> removeFromConversation(ConversationId conversationId,
-      ParticipantId participantId) {
-    return null;
-  }
+    @Override
+    public Mono<Void> removeFromConversation(ConversationId conversationId,
+                                             ParticipantId participantId) {
+        return null;
+    }
 }

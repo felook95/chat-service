@@ -19,6 +19,16 @@ public class ConversationDBO {
 
     Set<SentMessage> messageIds;
 
+    public static ConversationDBO from(Conversation conversation) {
+        ConversationDBO conversationDBO = new ConversationDBO();
+        conversationDBO.setId(conversation.getId() == null ? null : conversation.getId().id());
+        Set<JoinedParticipant> mappedParticipantIds = conversation.participants().stream().map(JoinedParticipant::fromParticipantId).collect(Collectors.toSet());
+        conversationDBO.setParticipantIds(mappedParticipantIds);
+        Set<SentMessage> mappedMessageIds = conversation.messages().stream().map(SentMessage::fromMessageId).collect(Collectors.toSet());
+        conversationDBO.setMessageIds(mappedMessageIds);
+        return conversationDBO;
+    }
+
     public BigInteger getId() {
         return id;
     }
@@ -41,16 +51,6 @@ public class ConversationDBO {
 
     public void setMessageIds(Set<SentMessage> messageIds) {
         this.messageIds = messageIds;
-    }
-
-    public static ConversationDBO from(Conversation conversation) {
-        ConversationDBO conversationDBO = new ConversationDBO();
-        conversationDBO.setId(conversation.getId() == null ? null : conversation.getId().id());
-        Set<JoinedParticipant> mappedParticipantIds = conversation.participants().stream().map(JoinedParticipant::fromParticipantId).collect(Collectors.toSet());
-        conversationDBO.setParticipantIds(mappedParticipantIds);
-        Set<SentMessage> mappedMessageIds = conversation.messages().stream().map(SentMessage::fromMessageId).collect(Collectors.toSet());
-        conversationDBO.setMessageIds(mappedMessageIds);
-        return conversationDBO;
     }
 
     public Conversation asConversation() {

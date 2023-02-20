@@ -12,61 +12,61 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Tag("unitTest")
 class MessageDTOMappingTest {
 
-  @Test
-  void domainToDTOIsMappedCorrectly() {
-    MessageId messageId = MessageId.of(BigInteger.valueOf(1L));
-    ParticipantId sender = ParticipantId.of(BigInteger.valueOf(1L));
-    MessageContent messageContent = MessageContent.of("Test message");
-    CreatedDateTime createdDateTime = CreatedDateTime.of(LocalDateTime.now().plusNanos(12345L));
-    Message message = new Message(sender, messageContent, createdDateTime);
-    message.setId(messageId);
-    message.changeStatusFlagTo(MessageStatus.DELETED);
+    private static void assertMappedCorrectly(MessageDTO messageDTO, Message message) {
+        assertThat(message.sender()).isEqualTo(ParticipantId.of(messageDTO.senderId()));
+        assertThat(message.content()).isEqualTo(MessageContent.of(messageDTO.content()));
+        assertThat(message.statusFlag()).isEqualTo(MessageStatus.valueOf(messageDTO.statusFlag()));
+        assertThat(message.createdDateTime()).isEqualTo(
+                CreatedDateTime.of(messageDTO.createdDateTime()));
+    }
 
-    MessageDTO messageDTO = MessageDTO.from(message);
+    @Test
+    void domainToDTOIsMappedCorrectly() {
+        MessageId messageId = MessageId.of(BigInteger.valueOf(1L));
+        ParticipantId sender = ParticipantId.of(BigInteger.valueOf(1L));
+        MessageContent messageContent = MessageContent.of("Test message");
+        CreatedDateTime createdDateTime = CreatedDateTime.of(LocalDateTime.now().plusNanos(12345L));
+        Message message = new Message(sender, messageContent, createdDateTime);
+        message.setId(messageId);
+        message.changeStatusFlagTo(MessageStatus.DELETED);
 
-    assertThat(messageDTO.id()).isEqualTo(messageId.id());
-    assertMappedCorrectly(messageDTO, message);
-  }
+        MessageDTO messageDTO = MessageDTO.from(message);
 
-  @Test
-  void domainToDTOIsMappedCorrectlyWithNullId() {
-    Message message = MessageFactory.defaultWIthIdOf(null);
-    message.changeStatusFlagTo(MessageStatus.DELETED);
+        assertThat(messageDTO.id()).isEqualTo(messageId.id());
+        assertMappedCorrectly(messageDTO, message);
+    }
 
-    MessageDTO messageDTO = MessageDTO.from(message);
+    @Test
+    void domainToDTOIsMappedCorrectlyWithNullId() {
+        Message message = MessageFactory.defaultWIthIdOf(null);
+        message.changeStatusFlagTo(MessageStatus.DELETED);
 
-    assertThat(messageDTO.id()).isNull();
-    assertMappedCorrectly(messageDTO, message);
-  }
+        MessageDTO messageDTO = MessageDTO.from(message);
 
-  @Test
-  void DTOToDomainIsMappedCorrectly() {
-    MessageDTO messageDTO = MessageDTO.from(
-        MessageFactory.defaultsWithStatusFlag(MessageStatus.DELETED));
+        assertThat(messageDTO.id()).isNull();
+        assertMappedCorrectly(messageDTO, message);
+    }
 
-    Message message = messageDTO.asMessage();
+    @Test
+    void DTOToDomainIsMappedCorrectly() {
+        MessageDTO messageDTO = MessageDTO.from(
+                MessageFactory.defaultsWithStatusFlag(MessageStatus.DELETED));
 
-    assertThat(message.id()).isEqualTo(MessageId.of(messageDTO.id()));
-    assertMappedCorrectly(messageDTO, message);
-  }
+        Message message = messageDTO.asMessage();
 
-  @Test
-  void DTOTODomainIsMappedCorrectlyWithNullId() {
-    MessageDTO messageDTO = MessageDTO.from(
-        MessageFactory.defaultWIthIdAndStatusFlag(null, MessageStatus.DELETED));
+        assertThat(message.id()).isEqualTo(MessageId.of(messageDTO.id()));
+        assertMappedCorrectly(messageDTO, message);
+    }
 
-    Message message = messageDTO.asMessage();
+    @Test
+    void DTOTODomainIsMappedCorrectlyWithNullId() {
+        MessageDTO messageDTO = MessageDTO.from(
+                MessageFactory.defaultWIthIdAndStatusFlag(null, MessageStatus.DELETED));
 
-    assertThat(message.id()).isNull();
-    assertMappedCorrectly(messageDTO, message);
-  }
+        Message message = messageDTO.asMessage();
 
-  private static void assertMappedCorrectly(MessageDTO messageDTO, Message message) {
-    assertThat(message.sender()).isEqualTo(ParticipantId.of(messageDTO.senderId()));
-    assertThat(message.content()).isEqualTo(MessageContent.of(messageDTO.content()));
-    assertThat(message.statusFlag()).isEqualTo(MessageStatus.valueOf(messageDTO.statusFlag()));
-    assertThat(message.createdDateTime()).isEqualTo(
-        CreatedDateTime.of(messageDTO.createdDateTime()));
-  }
+        assertThat(message.id()).isNull();
+        assertMappedCorrectly(messageDTO, message);
+    }
 
 }

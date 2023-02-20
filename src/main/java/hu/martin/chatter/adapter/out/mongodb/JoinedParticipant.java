@@ -6,21 +6,21 @@ import java.math.BigInteger;
 
 public class JoinedParticipant {
 
-  BigInteger id;
+    BigInteger id;
 
-  public JoinedParticipant() {
-  }
+    public JoinedParticipant() {
+    }
 
-  public JoinedParticipant(BigInteger id) {
-    this.id = id;
-  }
+    public JoinedParticipant(BigInteger id) {
+        this.id = id;
+    }
 
-  static JoinedParticipant fromParticipantId(ParticipantId participantId) {
-    return new JoinedParticipant(participantId.id());
-  }
+    static JoinedParticipant fromParticipantId(ParticipantId participantId) {
+        return new JoinedParticipant(participantId.id());
+    }
 
-  ParticipantId asParticipantId() {
-    return ParticipantId.of(id);
-  }
+    ParticipantId asParticipantId() {
+        return ParticipantId.of(id);
+    }
 
 }
