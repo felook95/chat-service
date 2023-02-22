@@ -1,6 +1,7 @@
 package hu.martin.chatter.adapter.in.web.conversation;
 
-import hu.martin.chatter.domain.*;
+import hu.martin.chatter.domain.message.*;
+import hu.martin.chatter.domain.participant.ParticipantId;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;

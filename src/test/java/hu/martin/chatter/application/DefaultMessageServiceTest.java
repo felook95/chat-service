@@ -1,8 +1,8 @@
 package hu.martin.chatter.application;
 
-import hu.martin.chatter.domain.Message;
-import hu.martin.chatter.domain.MessageContent;
-import hu.martin.chatter.domain.MessageFactory;
+import hu.martin.chatter.domain.message.MessageFactory;
+import hu.martin.chatter.domain.message.Message;
+import hu.martin.chatter.domain.message.MessageContent;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;

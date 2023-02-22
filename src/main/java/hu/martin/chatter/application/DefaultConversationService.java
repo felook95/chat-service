@@ -2,7 +2,11 @@ package hu.martin.chatter.application;
 
 import hu.martin.chatter.application.port.ConversationRepository;
 import hu.martin.chatter.application.port.MessageRepository;
-import hu.martin.chatter.domain.*;
+import hu.martin.chatter.domain.conversation.Conversation;
+import hu.martin.chatter.domain.conversation.ConversationId;
+import hu.martin.chatter.domain.message.Message;
+import hu.martin.chatter.domain.message.MessageId;
+import hu.martin.chatter.domain.participant.ParticipantId;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

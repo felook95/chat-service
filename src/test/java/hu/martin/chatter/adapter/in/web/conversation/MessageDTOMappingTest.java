@@ -1,6 +1,8 @@
 package hu.martin.chatter.adapter.in.web.conversation;
 
-import hu.martin.chatter.domain.*;
+import hu.martin.chatter.domain.message.MessageFactory;
+import hu.martin.chatter.domain.message.*;
+import hu.martin.chatter.domain.participant.ParticipantId;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 

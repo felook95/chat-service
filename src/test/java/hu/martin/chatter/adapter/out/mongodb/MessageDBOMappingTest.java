@@ -1,6 +1,8 @@
 package hu.martin.chatter.adapter.out.mongodb;
 
-import hu.martin.chatter.domain.*;
+import hu.martin.chatter.domain.message.MessageFactory;
+import hu.martin.chatter.domain.message.*;
+import hu.martin.chatter.domain.participant.ParticipantId;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;

@@ -1,4 +1,4 @@
-package hu.martin.chatter.domain;
+package hu.martin.chatter.domain.conversation;
 
 import java.math.BigInteger;
 

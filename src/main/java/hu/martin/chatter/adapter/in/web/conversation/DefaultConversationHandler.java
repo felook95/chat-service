@@ -1,8 +1,8 @@
 package hu.martin.chatter.adapter.in.web.conversation;
 
 import hu.martin.chatter.application.ConversationService;
-import hu.martin.chatter.domain.ConversationId;
-import hu.martin.chatter.domain.ParticipantId;
+import hu.martin.chatter.domain.conversation.ConversationId;
+import hu.martin.chatter.domain.participant.ParticipantId;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;

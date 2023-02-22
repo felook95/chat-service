@@ -1,4 +1,6 @@
-package hu.martin.chatter.domain;
+package hu.martin.chatter.domain.message;
+
+import hu.martin.chatter.domain.participant.ParticipantId;
 
 public class Message {
 

@@ -1,9 +1,9 @@
 package hu.martin.chatter.adapter.out.mongodb;
 
-import hu.martin.chatter.domain.Conversation;
-import hu.martin.chatter.domain.ConversationFactory;
-import hu.martin.chatter.domain.ConversationId;
-import hu.martin.chatter.domain.ParticipantId;
+import hu.martin.chatter.domain.conversation.ConversationFactory;
+import hu.martin.chatter.domain.conversation.Conversation;
+import hu.martin.chatter.domain.conversation.ConversationId;
+import hu.martin.chatter.domain.participant.ParticipantId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;

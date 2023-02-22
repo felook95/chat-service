@@ -1,4 +1,4 @@
-package hu.martin.chatter.domain;
+package hu.martin.chatter.domain.message;
 
 import java.time.LocalDateTime;
 

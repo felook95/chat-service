@@ -1,8 +1,8 @@
 package hu.martin.chatter.adapter.out.mongodb;
 
 import hu.martin.chatter.application.port.ConversationRepository;
-import hu.martin.chatter.domain.Conversation;
-import hu.martin.chatter.domain.ConversationId;
+import hu.martin.chatter.domain.conversation.Conversation;
+import hu.martin.chatter.domain.conversation.ConversationId;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 

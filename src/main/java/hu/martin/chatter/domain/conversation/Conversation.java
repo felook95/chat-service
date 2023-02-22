@@ -1,4 +1,7 @@
-package hu.martin.chatter.domain;
+package hu.martin.chatter.domain.conversation;
+
+import hu.martin.chatter.domain.message.MessageId;
+import hu.martin.chatter.domain.participant.ParticipantId;
 
 import java.util.Collections;
 import java.util.HashSet;

@@ -1,7 +1,7 @@
 package hu.martin.chatter.application.port;
 
-import hu.martin.chatter.domain.Message;
-import hu.martin.chatter.domain.MessageId;
+import hu.martin.chatter.domain.message.Message;
+import hu.martin.chatter.domain.message.MessageId;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

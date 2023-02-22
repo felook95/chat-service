@@ -1,9 +1,9 @@
 package hu.martin.chatter.application;
 
 import hu.martin.chatter.application.port.MessageRepository;
-import hu.martin.chatter.domain.Message;
-import hu.martin.chatter.domain.MessageContent;
-import hu.martin.chatter.domain.MessageId;
+import hu.martin.chatter.domain.message.Message;
+import hu.martin.chatter.domain.message.MessageContent;
+import hu.martin.chatter.domain.message.MessageId;
 import reactor.core.publisher.Mono;
 
 public class DefaultMessageService implements MessageService {

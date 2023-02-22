@@ -1,6 +1,6 @@
 package hu.martin.chatter.adapter.out.mongodb;
 
-import hu.martin.chatter.domain.ParticipantId;
+import hu.martin.chatter.domain.participant.ParticipantId;
 
 import java.math.BigInteger;
 
