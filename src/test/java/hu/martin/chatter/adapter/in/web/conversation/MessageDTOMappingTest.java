@@ -63,12 +63,21 @@ class MessageDTOMappingTest {
     @Test
     void DTOTODomainIsMappedCorrectlyWithNullId() {
         MessageDTO messageDTO = MessageDTO.from(
-                MessageFactory.defaultWIthIdAndStatusFlag(null, MessageStatus.DELETED));
+                MessageFactory.defaultWithIdAndStatusFlag(null, MessageStatus.DELETED));
 
         Message message = messageDTO.asMessage();
 
         assertThat(message.id()).isNull();
         assertMappedCorrectly(messageDTO, message);
+    }
+
+    @Test
+    void DTOWithoutMessageStatusShouldMapToCreatedStatus(){
+        MessageDTO testMessage = new MessageDTO(BigInteger.ONE, BigInteger.ONE, "TestMessage", null, LocalDateTime.now());
+
+        Message parsedMessage = testMessage.asMessage();
+
+        assertThat(parsedMessage.statusFlag()).isEqualTo(MessageStatus.CREATED);
     }
 
 }

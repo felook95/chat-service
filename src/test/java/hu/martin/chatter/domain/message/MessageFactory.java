@@ -1,6 +1,5 @@
 package hu.martin.chatter.domain.message;
 
-import hu.martin.chatter.domain.message.*;
 import hu.martin.chatter.domain.participant.ParticipantId;
 
 import java.math.BigInteger;
@@ -41,7 +40,7 @@ public class MessageFactory {
         return message;
     }
 
-    public static Message defaultWIthIdAndStatusFlag(MessageId messageId,
+    public static Message defaultWithIdAndStatusFlag(MessageId messageId,
                                                      MessageStatus messageStatus) {
         Message message = defaultWIthIdOf(messageId);
         message.changeStatusFlagTo(messageStatus);

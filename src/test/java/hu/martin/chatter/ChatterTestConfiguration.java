@@ -6,6 +6,7 @@ import hu.martin.chatter.application.ConversationService;
 import hu.martin.chatter.application.DefaultConversationService;
 import hu.martin.chatter.application.port.ConversationRepository;
 import hu.martin.chatter.application.port.MessageRepository;
+import hu.martin.chatter.application.time.UTCTimeProvider;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
@@ -16,7 +17,8 @@ public class ChatterTestConfiguration {
     ConversationService conversationService() {
         ConversationRepository conversationRepository = new InMemoryConversationRepository();
         MessageRepository messageRepository = new InMemoryMessageRepository();
-        return new DefaultConversationService(conversationRepository, messageRepository);
+        UTCTimeProvider utcTimeProvider = new UTCTimeProvider();
+        return new DefaultConversationService(conversationRepository, messageRepository, utcTimeProvider);
     }
 
 }

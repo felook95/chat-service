@@ -4,16 +4,20 @@ import hu.martin.chatter.domain.participant.ParticipantId;
 
 public class Message {
 
-    private final CreatedDateTime createdDateTime;
+    private CreatedDateTime createdDateTime;
     private final ParticipantId senderId;
     private MessageId id;
     private MessageContent content;
     private MessageStatus statusFlag;
 
-    public Message(ParticipantId senderId, MessageContent content, CreatedDateTime createdDateTime) {
+    public Message(ParticipantId senderId, MessageContent content) {
         this.senderId = senderId;
         this.content = content;
         this.statusFlag = MessageStatus.CREATED;
+    }
+
+    public Message(ParticipantId senderId, MessageContent content, CreatedDateTime createdDateTime) {
+        this(senderId, content);
         this.createdDateTime = createdDateTime;
     }
 
@@ -55,6 +59,10 @@ public class Message {
 
     public CreatedDateTime createdDateTime() {
         return createdDateTime;
+    }
+
+    public void changeCreatedDateTimeTo(CreatedDateTime createdDateTime) {
+        this.createdDateTime = createdDateTime;
     }
 
     public void changeStatusFlagTo(MessageStatus newStatusFlag) {

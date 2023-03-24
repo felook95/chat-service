@@ -61,7 +61,7 @@ class MessageDBOMappingTest {
     @Test
     void DBOTODomainIsMappedCorrectlyWithNullId() {
         MessageDBO messageDBO = MessageDBO.from(
-                MessageFactory.defaultWIthIdAndStatusFlag(null, MessageStatus.DELETED));
+                MessageFactory.defaultWithIdAndStatusFlag(null, MessageStatus.DELETED));
 
         Message message = messageDBO.asMessage();
 

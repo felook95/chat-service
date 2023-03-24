@@ -24,7 +24,9 @@ public record MessageDTO(BigInteger id, BigInteger senderId, String content, Str
                 MessageContent.of(content),
                 CreatedDateTime.of(createdDateTime)
         );
-        message.changeStatusFlagTo(MessageStatus.valueOf(statusFlag));
+        if (statusFlag != null) {
+            message.changeStatusFlagTo(MessageStatus.valueOf(statusFlag));
+        }
         if (id != null) {
             message.setId(MessageId.of(id));
         }

@@ -4,12 +4,12 @@ import hu.martin.chatter.adapter.out.inmemory.InMemoryConversationRepository;
 import hu.martin.chatter.adapter.out.inmemory.InMemoryMessageRepository;
 import hu.martin.chatter.application.port.ConversationRepository;
 import hu.martin.chatter.application.port.MessageRepository;
-import hu.martin.chatter.domain.conversation.ConversationFactory;
-import hu.martin.chatter.domain.message.MessageFactory;
 import hu.martin.chatter.domain.conversation.Conversation;
+import hu.martin.chatter.domain.conversation.ConversationFactory;
 import hu.martin.chatter.domain.conversation.ConversationId;
 import hu.martin.chatter.domain.message.*;
 import hu.martin.chatter.domain.participant.ParticipantId;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -121,14 +122,12 @@ class ConversationServiceTest {
         ConversationService conversationService = ConversationServiceFactory.withDefaults();
         ParticipantId senderId = ParticipantId.of(BigInteger.valueOf(1L));
         MessageContent messageContent = MessageContent.of("Test message");
-        CreatedDateTime createdDateTime = CreatedDateTime.of(LocalDateTime.now().plusNanos(123456));
 
         MessageId storedMessageId = conversationService.receiveMessage(
-                new Message(senderId, messageContent, createdDateTime)).block().id();
+                new Message(senderId, messageContent)).block().id();
 
         Message foundMessage = conversationService.findMessageById(storedMessageId).block();
 
-        assertThat(foundMessage.createdDateTime()).isEqualTo(createdDateTime);
         assertThat(foundMessage.content()).isEqualTo(messageContent);
     }
 
@@ -189,6 +188,21 @@ class ConversationServiceTest {
     }
 
     @Test
+    void receiveAndSendMessageReturnsSavedMessageWithCreatedDateTime() {
+        ConversationService conversationService = ConversationServiceFactory.withDefaults();
+        ConversationId conversationId = conversationService.startConversation().block().getId();
+        ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
+        conversationService.joinParticipantTo(conversationId, participantId).block();
+        Message message = MessageFactory.defaultWIthCreatedDateTimeOf(null);
+        message.setId(null);
+
+        Message savedMessage = conversationService.receiveAndSendMessageTo(conversationId, message)
+                .block();
+
+        assertThat(savedMessage.createdDateTime()).isNotNull();
+    }
+
+    @Test
     void messageSentByNonParticipantThrowsException() {
         ConversationService conversationService = ConversationServiceFactory.withDefaults();
         Conversation conversation = conversationService.startConversation().block();
@@ -234,33 +248,44 @@ class ConversationServiceTest {
 
     @Test
     void conversationReturnsMessagesInChronologicalOrder() {
-        ConversationService conversationService = ConversationServiceFactory.withDefaults();
+        ConversationService conversationService = getConversationServiceWithTimeProviderInMixedOrder();
         ConversationId conversationId = conversationService.startConversation().block().getId();
-        CreatedDateTime oldestDateTime = CreatedDateTime.of(LocalDateTime.now().plusDays(3));
-        CreatedDateTime mostRecentDateTime = CreatedDateTime.of(LocalDateTime.now().plusDays(0));
-        CreatedDateTime middleDateTime = CreatedDateTime.of(LocalDateTime.now().plusDays(2));
-        saveRandomMessageToConversationWithCreatedDateTime(conversationService, oldestDateTime,
-                conversationId);
-        saveRandomMessageToConversationWithCreatedDateTime(conversationService, mostRecentDateTime,
-                conversationId);
-        saveRandomMessageToConversationWithCreatedDateTime(conversationService, middleDateTime,
-                conversationId);
+        saveNCountRandomMessageToConversation(conversationService, conversationId, 3);
 
-        Collection<Message> orderedMessages = conversationService.messagesByChronologicalOrderFrom(
-                conversationId).collectList().block();
+        Collection<Message> orderedMessages = conversationService
+                .messagesByChronologicalOrderFrom(conversationId)
+                .collectList().block();
 
-        assertThat(orderedMessages).extracting(Message::createdDateTime)
-                .containsExactly(mostRecentDateTime, middleDateTime, oldestDateTime);
+        assertThat(orderedMessages)
+                .extracting(Message::createdDateTime)
+                .extracting(CreatedDateTime::createdDateTime)
+                .isSorted();
     }
 
-    private void saveRandomMessageToConversationWithCreatedDateTime(
-            ConversationService conversationService, CreatedDateTime createdDateTime,
-            ConversationId conversationId) {
+    @NotNull
+    private static ConversationService getConversationServiceWithTimeProviderInMixedOrder() {
+        LocalDateTime mostRecentDateTime = LocalDateTime.now().minusDays(0);
+        LocalDateTime middleDateTime = LocalDateTime.now().minusDays(1);
+        LocalDateTime oldestDateTime = LocalDateTime.now().minusDays(2);
+
+        List<LocalDateTime> dateTimesToReturn = List.of(middleDateTime, mostRecentDateTime, oldestDateTime);
+        OrderedTimeProvider orderedTimeProvider = new OrderedTimeProvider(dateTimesToReturn);
+        return ConversationServiceFactory.withTimeProvider(orderedTimeProvider);
+    }
+
+    private void saveNCountRandomMessageToConversation(ConversationService conversationService,
+                                                       ConversationId conversationId, int count) {
+        for (int i = 0; i < count; i++) {
+            saveRandomMessageToConversation(conversationService, conversationId);
+        }
+    }
+
+    private void saveRandomMessageToConversation(ConversationService conversationService, ConversationId conversationId) {
         ParticipantId senderId = ParticipantId.of(BigInteger.valueOf(1L));
         MessageContent messageContent = MessageContent.of("");
         conversationService.joinParticipantTo(conversationId, senderId).block();
         MessageId savedMessageId = conversationService.receiveMessage(
-                new Message(senderId, messageContent, createdDateTime)).block().id();
+                new Message(senderId, messageContent)).block().id();
         conversationService.sendMessageTo(savedMessageId, conversationId).block();
     }
 
