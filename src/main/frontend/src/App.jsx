@@ -1,11 +1,16 @@
 import MainRouter from './MainRouter';
 import { BrowserRouter } from 'react-router-dom';
+import { CssBaseline, ThemeProvider } from '@mui/material';
+import Themes from './themes';
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <MainRouter />
-    </BrowserRouter>
+    <ThemeProvider theme={Themes.default}>
+      <CssBaseline />
+      <BrowserRouter>
+        <MainRouter />
+      </BrowserRouter>
+    </ThemeProvider>
   );
 };
 
