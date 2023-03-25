@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Avatar, List, ListItem, Typography } from '@mui/material';
+import { getMessages } from './api-messages';
 
 const Messages = ({ conversationId }) => {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    fetch(`/conversation/${conversationId}`)
-      .then((data) => data.json())
-      .then(console.log);
+    getMessages(conversationId).then(console.log);
     const mockMessages = [];
     setMessages(mockMessages);
   }, [conversationId]);
