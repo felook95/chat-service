@@ -62,7 +62,7 @@ public class DefaultConversationService implements ConversationService {
     }
 
     @Override
-    public Mono<Void> sendMessageTo(MessageId messageId, ConversationId conversationId) {
+    public Mono<Conversation> sendMessageTo(MessageId messageId, ConversationId conversationId) {
         return Mono.zip(findConversationById(conversationId), findMessageById(messageId)).map(objects -> {
             Conversation conversation = objects.getT1();
             Message message = objects.getT2();
@@ -70,7 +70,7 @@ public class DefaultConversationService implements ConversationService {
             assertConversationHasParticipant(conversation, senderId);
             conversation.messageSent(messageId);
             return conversation;
-        }).map(this::saveConversation).then();
+        }).flatMap(this::saveConversation);
     }
 
     @Override

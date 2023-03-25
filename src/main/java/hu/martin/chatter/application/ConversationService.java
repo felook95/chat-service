@@ -20,7 +20,7 @@ public interface ConversationService {
 
     Mono<Message> receiveMessage(Message message);
 
-    Mono<Void> sendMessageTo(MessageId messageId, ConversationId conversationId);
+    Mono<Conversation> sendMessageTo(MessageId messageId, ConversationId conversationId);
 
     Mono<Message> receiveAndSendMessageTo(ConversationId conversationId, Message message);
 

@@ -49,7 +49,7 @@ public class StubConversationServiceForSendingMessage implements ConversationSer
     }
 
     @Override
-    public Mono<Void> sendMessageTo(MessageId messageId, ConversationId conversationId) {
+    public Mono<Conversation> sendMessageTo(MessageId messageId, ConversationId conversationId) {
         conversation.messageSent(messageId);
         return null;
     }

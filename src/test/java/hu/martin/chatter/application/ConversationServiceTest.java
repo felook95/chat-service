@@ -210,7 +210,7 @@ class ConversationServiceTest {
         MessageId messageId = message.id();
         ConversationId conversationId = conversation.getId();
 
-        Mono<Void> sendMessageToMono = conversationService.sendMessageTo(messageId, conversationId);
+        Mono<Conversation> sendMessageToMono = conversationService.sendMessageTo(messageId, conversationId);
         assertThatThrownBy(
                 sendMessageToMono::block).isInstanceOf(
                 IllegalArgumentException.class);
