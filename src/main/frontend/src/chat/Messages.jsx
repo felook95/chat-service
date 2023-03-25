@@ -10,7 +10,7 @@ const Messages = ({ conversationId }) => {
       .then(console.log);
     const mockMessages = [];
     setMessages(mockMessages);
-  }, []);
+  }, [conversationId]);
 
   return (
     <List>
