@@ -193,7 +193,7 @@ class ConversationServiceTest {
         ConversationId conversationId = conversationService.startConversation().block().getId();
         ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
         conversationService.joinParticipantTo(conversationId, participantId).block();
-        Message message = MessageFactory.defaultWIthCreatedDateTimeOf(null);
+        Message message = MessageFactory.defaultWithCreatedDateTimeOf(null);
         message.setId(null);
 
         Message savedMessage = conversationService.receiveAndSendMessageTo(conversationId, message)

@@ -9,6 +9,7 @@ import hu.martin.chatter.domain.message.CreatedDateTime;
 import hu.martin.chatter.domain.message.Message;
 import hu.martin.chatter.domain.message.MessageId;
 import hu.martin.chatter.domain.participant.ParticipantId;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.Set;
 
+@Service
 public class DefaultConversationService implements ConversationService {
 
     private final ConversationRepository conversationRepository;
@@ -75,7 +77,7 @@ public class DefaultConversationService implements ConversationService {
 
     @Override
     public Mono<Message> receiveAndSendMessageTo(ConversationId conversationId, Message message) {
-        return receiveMessage(message).flatMap(receivedMessage -> sendMessageTo(message.id(), conversationId).thenReturn(receivedMessage));
+        return receiveMessage(message).flatMap(receivedMessage -> sendMessageTo(receivedMessage.id(), conversationId).thenReturn(receivedMessage));
     }
 
     @Override

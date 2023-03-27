@@ -80,7 +80,7 @@ class MessageTest {
 
     @Test
     void changeCreatedDateTimeToSetsTheCorrectDateTime() {
-        Message message = MessageFactory.defaultWIthCreatedDateTimeOf(null);
+        Message message = MessageFactory.defaultWithCreatedDateTimeOf(null);
 
         LocalDateTime newCreatedDateTime = LocalDateTime.of(2023, 3, 23, 23, 30);
         message.changeCreatedDateTimeTo(CreatedDateTime.of(newCreatedDateTime));

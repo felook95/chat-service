@@ -26,7 +26,7 @@ public class MessageFactory {
         return message;
     }
 
-    public static Message defaultWIthCreatedDateTimeOf(CreatedDateTime createdDateTime) {
+    public static Message defaultWithCreatedDateTimeOf(CreatedDateTime createdDateTime) {
         ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
         MessageContent messageContent = MessageContent.of("");
         Message message = new Message(participantId, messageContent, createdDateTime);

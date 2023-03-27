@@ -75,7 +75,7 @@ class ConversationRouterTest {
 
     @Test
     void sendingMessageToConversationReturnsMessageDTO() {
-        Message message = MessageFactory.defaultWIthCreatedDateTimeOf(
+        Message message = MessageFactory.defaultWithCreatedDateTimeOf(
                 CreatedDateTime.of(LocalDateTime.parse("2022-11-03T18:27:40.005661434")));
         when(conversationService.receiveAndSendMessageTo(any(), any())).thenReturn(Mono.just(message));
         MessageDTO messageDTO = MessageDTO.from(message);
@@ -95,7 +95,7 @@ class ConversationRouterTest {
     void storedMessagesCanBeRetrievedFromConversation() {
         CreatedDateTime createdDateTime = CreatedDateTime.of(
                 LocalDateTime.parse("2022-11-03T18:38:20.005661434"));
-        Message message = MessageFactory.defaultWIthCreatedDateTimeOf(createdDateTime);
+        Message message = MessageFactory.defaultWithCreatedDateTimeOf(createdDateTime);
         when(conversationService.messagesFrom(any())).thenReturn(Flux.just(message));
 
         client.get().uri("/conversation/1/messages").exchange().expectBody()
