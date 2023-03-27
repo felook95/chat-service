@@ -6,9 +6,7 @@ const Messages = ({ conversationId }) => {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    getMessages(conversationId).then(console.log);
-    const mockMessages = [];
-    setMessages(mockMessages);
+    getMessages(conversationId).then(setMessages);
   }, [conversationId]);
 
   return (
