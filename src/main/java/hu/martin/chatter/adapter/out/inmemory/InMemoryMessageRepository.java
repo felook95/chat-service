@@ -3,6 +3,7 @@ package hu.martin.chatter.adapter.out.inmemory;
 import hu.martin.chatter.application.port.MessageRepository;
 import hu.martin.chatter.domain.message.Message;
 import hu.martin.chatter.domain.message.MessageId;
+import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -43,5 +44,10 @@ public class InMemoryMessageRepository implements MessageRepository {
         Stream<Message> messageStream = messages.values().stream()
                 .filter(message -> messageIdsToLookFor.contains(message.id()));
         return Flux.fromStream(messageStream);
+    }
+
+    @Override
+    public Flux<Message> findByIdsPageable(Set<MessageId> messageIdsToLookFor, Pageable pageable) {
+        return null;
     }
 }

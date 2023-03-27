@@ -1,5 +1,6 @@
 package hu.martin.chatter.adapter.out.mongodb;
 
+import hu.martin.chatter.domain.message.CreatedDateTime;
 import hu.martin.chatter.domain.message.Message;
 import hu.martin.chatter.domain.message.MessageFactory;
 import hu.martin.chatter.domain.message.MessageId;
@@ -7,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MongoDBContainer;
@@ -14,11 +17,13 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Testcontainers
 @DataMongoTest
@@ -62,15 +67,39 @@ class MessageR2DBCRepositoryAdapterTest {
 
     @Test
     void findByIdsReturnsAllRequestedMessages() {
-        Set<MessageId> savedMessageIds = new HashSet<>();
-        for (int i = 0; i < 10; i++) {
-            Message messageToSave = MessageFactory.defaultWIthIdOf(null);
-            MessageId savedMessageId = messageR2DBCRepositoryAdapter.save(messageToSave).block().id();
-            savedMessageIds.add(savedMessageId);
-        }
+        Set<MessageId> savedMessageIds = saveMessagesThenReturnMessageIdsTimes(3);
 
         List<Message> retrievedMessages = messageR2DBCRepositoryAdapter.findByIds(savedMessageIds).collectList().block();
 
         assertThat(retrievedMessages.size()).isEqualTo(savedMessageIds.size());
+    }
+
+    @Test
+    void findByIdPageable() {
+        Set<MessageId> savedMessageIds = saveMessagesThenReturnMessageIdsTimes(10);
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("createdAt"));
+
+        Collection<Message> pagedMessages = messageR2DBCRepositoryAdapter.findByIdsPageable(savedMessageIds, pageRequest)
+                .collectList().block();
+
+        assertThat(pagedMessages).isNotNull();
+        assertThat(pagedMessages.size()).isEqualTo(pagedMessages.size());
+        assertThat(pagedMessages)
+                .extracting(Message::createdDateTime)
+                .extracting(CreatedDateTime::createdDateTime)
+                .isSorted();
+    }
+
+    private Set<MessageId> saveMessagesThenReturnMessageIdsTimes(int times) {
+        Set<MessageId> savedMessageIds = new HashSet<>();
+        LocalDateTime now = LocalDateTime.now();
+        for (int i = 0; i < times; i++) {
+            Message messageToSave = MessageFactory.defaultWIthIdOf(null);
+            messageToSave.changeCreatedDateTimeTo(CreatedDateTime.of(now));
+            now = now.plusSeconds(1);
+            MessageId savedMessageId = messageR2DBCRepositoryAdapter.save(messageToSave).block().id();
+            savedMessageIds.add(savedMessageId);
+        }
+        return savedMessageIds;
     }
 }

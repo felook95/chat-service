@@ -3,6 +3,7 @@ package hu.martin.chatter.adapter.out.mongodb;
 import hu.martin.chatter.application.port.MessageRepository;
 import hu.martin.chatter.domain.message.Message;
 import hu.martin.chatter.domain.message.MessageId;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -36,5 +37,12 @@ public class MessageR2DBCRepositoryAdapter implements MessageRepository {
     public Flux<Message> findByIds(Set<MessageId> messageIdsToLookFor) {
         Collection<BigInteger> messageIds = messageIdsToLookFor.stream().map(MessageId::id).collect(Collectors.toSet());
         return messageRepository.findAllById(messageIds).map(MessageDBO::asMessage);
+    }
+
+    @Override
+    public Flux<Message> findByIdsPageable(Set<MessageId> messageIdsToLookFor, Pageable pageable) {
+        Collection<BigInteger> messageIds = messageIdsToLookFor.stream().map(MessageId::id).collect(Collectors.toSet());
+        return messageRepository.findByIdIn(messageIds,pageable)
+                .map(MessageDBO::asMessage);
     }
 }
