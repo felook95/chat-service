@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Set;
 
 public interface MessageRepository {
@@ -16,5 +17,5 @@ public interface MessageRepository {
 
     Flux<Message> findByIds(Set<MessageId> messageIdsToLookFor);
 
-    Flux<Message> findByIdsPageable(Set<MessageId> messageIdsToLookFor, Pageable pageable);
+    Flux<Message> findByIdsPageable(List<MessageId> messageIdsToLookFor, Pageable pageable);
 }

@@ -45,7 +45,15 @@ public class InMemoryMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Flux<Message> findByIdsPageable(Set<MessageId> messageIdsToLookFor, Pageable pageable) {
-        return null;
+    public Flux<Message> findByIdsPageable(List<MessageId> messageIdsToLookFor, Pageable pageable) {
+        int fromIndex = pageable.getPageSize() * pageable.getPageNumber();
+        int toIndex = pageable.getPageSize();
+
+        LinkedList<Message> messagesList = new LinkedList<>(messages.values());
+        Collections.reverse(messagesList);
+        Stream<Message> pagedMessagesStream = messagesList.stream()
+                .filter(messageIdMessageEntry -> messageIdsToLookFor.contains(messageIdMessageEntry.id()))
+                .skip(fromIndex).limit(toIndex);
+        return Flux.fromStream(pagedMessagesStream);
     }
 }

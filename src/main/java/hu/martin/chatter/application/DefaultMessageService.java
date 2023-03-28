@@ -4,7 +4,12 @@ import hu.martin.chatter.application.port.MessageRepository;
 import hu.martin.chatter.domain.message.Message;
 import hu.martin.chatter.domain.message.MessageContent;
 import hu.martin.chatter.domain.message.MessageId;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 public class DefaultMessageService implements MessageService {
 
@@ -26,5 +31,15 @@ public class DefaultMessageService implements MessageService {
                     message.changeContentTo(newContent);
                     return message;
                 }).flatMap(messageRepository::save);
+    }
+
+    @Override
+    public Flux<Message> findAllByIdOrderedByCreatedDateTime(List<MessageId> messageIdsToLookFor, PageRequest pageRequest) {
+        pageRequest = decoratePageRequestWithSortingByCreatedAt(pageRequest);
+        return messageRepository.findByIdsPageable(messageIdsToLookFor, pageRequest);
+    }
+
+    private static PageRequest decoratePageRequestWithSortingByCreatedAt(PageRequest pageRequest) {
+        return pageRequest.withSort(Sort.by("createdAt"));
     }
 }

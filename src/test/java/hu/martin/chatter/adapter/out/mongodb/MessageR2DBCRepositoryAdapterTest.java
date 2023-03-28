@@ -18,10 +18,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -67,7 +64,7 @@ class MessageR2DBCRepositoryAdapterTest {
 
     @Test
     void findByIdsReturnsAllRequestedMessages() {
-        Set<MessageId> savedMessageIds = saveMessagesThenReturnMessageIdsTimes(3);
+        Set<MessageId> savedMessageIds = new HashSet<>(saveMessagesThenReturnMessageIdsTimes(3));
 
         List<Message> retrievedMessages = messageR2DBCRepositoryAdapter.findByIds(savedMessageIds).collectList().block();
 
@@ -76,7 +73,7 @@ class MessageR2DBCRepositoryAdapterTest {
 
     @Test
     void findByIdPageable() {
-        Set<MessageId> savedMessageIds = saveMessagesThenReturnMessageIdsTimes(10);
+        List<MessageId> savedMessageIds = saveMessagesThenReturnMessageIdsTimes(10);
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("createdAt"));
 
         Collection<Message> pagedMessages = messageR2DBCRepositoryAdapter.findByIdsPageable(savedMessageIds, pageRequest)
@@ -90,8 +87,8 @@ class MessageR2DBCRepositoryAdapterTest {
                 .isSorted();
     }
 
-    private Set<MessageId> saveMessagesThenReturnMessageIdsTimes(int times) {
-        Set<MessageId> savedMessageIds = new HashSet<>();
+    private List<MessageId> saveMessagesThenReturnMessageIdsTimes(int times) {
+        List<MessageId> savedMessageIds = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
         for (int i = 0; i < times; i++) {
             Message messageToSave = MessageFactory.defaultWIthIdOf(null);
