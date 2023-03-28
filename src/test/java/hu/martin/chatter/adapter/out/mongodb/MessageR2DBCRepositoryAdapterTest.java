@@ -68,7 +68,7 @@ class MessageR2DBCRepositoryAdapterTest {
 
         List<Message> retrievedMessages = messageR2DBCRepositoryAdapter.findByIds(savedMessageIds).collectList().block();
 
-        assertThat(retrievedMessages.size()).isEqualTo(savedMessageIds.size());
+        assertThat(retrievedMessages).hasSameSizeAs(savedMessageIds);
     }
 
     @Test
@@ -80,7 +80,7 @@ class MessageR2DBCRepositoryAdapterTest {
                 .collectList().block();
 
         assertThat(pagedMessages).isNotNull();
-        assertThat(pagedMessages.size()).isEqualTo(pagedMessages.size());
+        assertThat(pagedMessages).hasSameSizeAs(pagedMessages);
         assertThat(pagedMessages)
                 .extracting(Message::createdDateTime)
                 .extracting(CreatedDateTime::createdDateTime)
