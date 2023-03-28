@@ -79,9 +79,8 @@ class MessageR2DBCRepositoryAdapterTest {
         Collection<Message> pagedMessages = messageR2DBCRepositoryAdapter.findByIdsPageable(savedMessageIds, pageRequest)
                 .collectList().block();
 
-        assertThat(pagedMessages).isNotNull();
-        assertThat(pagedMessages).hasSameSizeAs(pagedMessages);
-        assertThat(pagedMessages)
+        assertThat(pagedMessages).isNotNull()
+                .hasSameSizeAs(pageRequest.getPageSize())
                 .extracting(Message::createdDateTime)
                 .extracting(CreatedDateTime::createdDateTime)
                 .isSorted();
