@@ -72,7 +72,7 @@ class MessageR2DBCRepositoryAdapterTest {
     }
 
     @Test
-    void findByIdPageable() {
+    void findByIdsPageableReturnsMessagesOrderedMatchingPageRequest() {
         List<MessageId> savedMessageIds = saveMessagesThenReturnMessageIdsTimes(10);
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("createdAt"));
 
@@ -80,7 +80,7 @@ class MessageR2DBCRepositoryAdapterTest {
                 .collectList().block();
 
         assertThat(pagedMessages).isNotNull()
-                .hasSameSizeAs(pageRequest.getPageSize())
+                .hasSize(pageRequest.getPageSize())
                 .extracting(Message::createdDateTime)
                 .extracting(CreatedDateTime::createdDateTime)
                 .isSorted();
