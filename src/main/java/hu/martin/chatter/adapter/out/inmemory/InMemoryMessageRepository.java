@@ -8,15 +8,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 public class InMemoryMessageRepository implements MessageRepository {
 
-    private final Map<MessageId, Message> messages = new HashMap<>();
+    private final Map<MessageId, Message> messages = new LinkedHashMap<>();
 
     private final AtomicReference<BigInteger> sequence = new AtomicReference<>(BigInteger.ONE);
 
@@ -24,7 +22,7 @@ public class InMemoryMessageRepository implements MessageRepository {
     public Mono<Message> save(Message message) {
         if (message.id() == null) {
             BigInteger id = getNextId();
-            message.setId(MessageId.of(id));
+            message.changeIdTo(MessageId.of(id));
         }
         messages.put(message.id(), message);
         return Mono.just(message);

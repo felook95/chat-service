@@ -4,11 +4,11 @@ import hu.martin.chatter.domain.participant.ParticipantId;
 
 public class Message {
 
-    private CreatedDateTime createdDateTime;
-    private final ParticipantId senderId;
     private MessageId id;
+    private final ParticipantId senderId;
     private MessageContent content;
     private MessageStatus statusFlag;
+    private CreatedDateTime createdDateTime;
 
     public Message(ParticipantId senderId, MessageContent content) {
         this.senderId = senderId;
@@ -53,7 +53,7 @@ public class Message {
         return id;
     }
 
-    public void setId(MessageId id) {
+    public void changeIdTo(MessageId id) {
         this.id = id;
     }
 

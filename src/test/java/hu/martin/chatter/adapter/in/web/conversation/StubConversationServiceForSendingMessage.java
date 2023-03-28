@@ -44,7 +44,7 @@ public class StubConversationServiceForSendingMessage implements ConversationSer
 
     @Override
     public Mono<Message> receiveMessage(Message message) {
-        message.setId(MessageId.of(BigInteger.valueOf(1L)));
+        message.changeIdTo(MessageId.of(BigInteger.valueOf(1L)));
         return Mono.just(message);
     }
 

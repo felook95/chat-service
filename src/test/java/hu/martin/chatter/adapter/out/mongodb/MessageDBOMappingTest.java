@@ -27,7 +27,7 @@ class MessageDBOMappingTest {
         MessageContent messageContent = MessageContent.of("Test message");
         CreatedDateTime createdDateTime = CreatedDateTime.of(LocalDateTime.now().plusNanos(12345L));
         Message message = new Message(sender, messageContent, createdDateTime);
-        message.setId(messageId);
+        message.changeIdTo(messageId);
         message.changeStatusFlagTo(MessageStatus.DELETED);
 
         MessageDBO messageDBO = MessageDBO.from(message);

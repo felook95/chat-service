@@ -79,7 +79,7 @@ public class MessageDBO {
         );
         message.changeStatusFlagTo(MessageStatus.valueOf(statusFlag));
         if (id != null) {
-            message.setId(MessageId.of(id));
+            message.changeIdTo(MessageId.of(id));
         }
 
         return message;

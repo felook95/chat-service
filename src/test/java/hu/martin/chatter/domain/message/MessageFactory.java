@@ -14,7 +14,7 @@ public class MessageFactory {
 
     public static Message defaultWIthIdOf(MessageId messageId) {
         Message message = withDefaults();
-        message.setId(messageId);
+        message.changeIdTo(messageId);
         return message;
     }
 
@@ -22,7 +22,7 @@ public class MessageFactory {
         MessageContent messageContent = MessageContent.of("");
         CreatedDateTime createdDateTime = CreatedDateTime.of(LocalDateTime.now());
         Message message = new Message(participantId, messageContent, createdDateTime);
-        message.setId(MessageId.of(BigInteger.valueOf(1L)));
+        message.changeIdTo(MessageId.of(BigInteger.valueOf(1L)));
         return message;
     }
 
@@ -30,7 +30,7 @@ public class MessageFactory {
         ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
         MessageContent messageContent = MessageContent.of("");
         Message message = new Message(participantId, messageContent, createdDateTime);
-        message.setId(MessageId.of(BigInteger.valueOf(1L)));
+        message.changeIdTo(MessageId.of(BigInteger.valueOf(1L)));
         return message;
     }
 

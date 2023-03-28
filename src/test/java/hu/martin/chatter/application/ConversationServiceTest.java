@@ -178,7 +178,7 @@ class ConversationServiceTest {
         ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
         conversationService.joinParticipantTo(conversationId, participantId).block();
         Message message = MessageFactory.defaultWithSender(participantId);
-        message.setId(null);
+        message.changeIdTo(null);
 
         Message savedMessage = conversationService.receiveAndSendMessageTo(conversationId, message)
                 .block();
@@ -194,7 +194,7 @@ class ConversationServiceTest {
         ParticipantId participantId = ParticipantId.of(BigInteger.valueOf(1L));
         conversationService.joinParticipantTo(conversationId, participantId).block();
         Message message = MessageFactory.defaultWithCreatedDateTimeOf(null);
-        message.setId(null);
+        message.changeIdTo(null);
 
         Message savedMessage = conversationService.receiveAndSendMessageTo(conversationId, message)
                 .block();

@@ -10,6 +10,7 @@ import reactor.core.publisher.Mono;
 
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,9 +41,9 @@ public class MessageR2DBCRepositoryAdapter implements MessageRepository {
     }
 
     @Override
-    public Flux<Message> findByIdsPageable(Set<MessageId> messageIdsToLookFor, Pageable pageable) {
+    public Flux<Message> findByIdsPageable(List<MessageId> messageIdsToLookFor, Pageable pageable) {
         Collection<BigInteger> messageIds = messageIdsToLookFor.stream().map(MessageId::id).collect(Collectors.toSet());
-        return messageRepository.findByIdIn(messageIds,pageable)
+        return messageRepository.findByIdIn(messageIds, pageable)
                 .map(MessageDBO::asMessage);
     }
 }
