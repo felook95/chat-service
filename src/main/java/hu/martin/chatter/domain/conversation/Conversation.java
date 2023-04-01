@@ -9,9 +9,9 @@ import java.util.Set;
 
 public class Conversation {
 
+    private ConversationId conversationId;
     private final Set<ParticipantId> participants = new HashSet<>();
     private final Set<MessageId> messages = new HashSet<>();
-    private ConversationId conversationId;
 
     public void joinedBy(ParticipantId participantId) {
         assertNotNull(participantId, "participantId must not be null!");
