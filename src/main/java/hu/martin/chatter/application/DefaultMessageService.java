@@ -6,11 +6,13 @@ import hu.martin.chatter.application.port.MessageRepository;
 import hu.martin.chatter.domain.message.Message;
 import hu.martin.chatter.domain.message.MessageContent;
 import hu.martin.chatter.domain.message.MessageId;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+@Service
 public class DefaultMessageService implements MessageService {
 
     private final MessageRepository messageRepository;
