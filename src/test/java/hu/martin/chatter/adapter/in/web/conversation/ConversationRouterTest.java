@@ -1,12 +1,13 @@
 package hu.martin.chatter.adapter.in.web.conversation;
 
 import hu.martin.chatter.application.ConversationService;
-import hu.martin.chatter.domain.conversation.ConversationFactory;
-import hu.martin.chatter.domain.message.MessageFactory;
+import hu.martin.chatter.application.MessageService;
 import hu.martin.chatter.domain.conversation.Conversation;
+import hu.martin.chatter.domain.conversation.ConversationFactory;
 import hu.martin.chatter.domain.conversation.ConversationId;
 import hu.martin.chatter.domain.message.CreatedDateTime;
 import hu.martin.chatter.domain.message.Message;
+import hu.martin.chatter.domain.message.MessageFactory;
 import hu.martin.chatter.domain.participant.ParticipantId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,9 @@ class ConversationRouterTest {
 
     @MockBean
     private ConversationService conversationService;
+
+    @MockBean
+    private MessageService messageService;
 
     @Autowired
     private WebTestClient client;
@@ -92,14 +96,18 @@ class ConversationRouterTest {
     }
 
     @Test
-    void storedMessagesCanBeRetrievedFromConversation() {
+    void storedMessagesCanBeRetrievedFromConversationPaged() {
         CreatedDateTime createdDateTime = CreatedDateTime.of(
                 LocalDateTime.parse("2022-11-03T18:38:20.005661434"));
         Message message = MessageFactory.defaultWithCreatedDateTimeOf(createdDateTime);
-        when(conversationService.messagesFrom(any())).thenReturn(Flux.just(message));
+        when(conversationService.messageIdsFrom(any())).thenReturn(Flux.just(message.id()));
+        when(messageService.findAllByIdOrderedByCreatedDateTime(any(), any())).thenReturn(Flux.just(message));
 
-        client.get().uri("/conversation/1/messages").exchange().expectBody()
-                .json("""
+        client.get()
+                .uri("/conversation/1/messages?pageIndex=2&pageSize=3")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody().json("""
                         [{"senderId":1,"content":"","createdDateTime":"2022-11-03T18:38:20.005661434"}]
                         """);
     }

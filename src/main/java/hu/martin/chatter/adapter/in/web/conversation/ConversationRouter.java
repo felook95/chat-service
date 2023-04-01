@@ -2,6 +2,7 @@ package hu.martin.chatter.adapter.in.web.conversation;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
@@ -15,7 +16,10 @@ public class ConversationRouter {
     @Bean
     RouterFunction<ServerResponse> conversationRoute(ConversationHandler conversationHandler) {
         RouterFunction<ServerResponse> conversationRoute = route()
-                .GET("/{conversationId}/messages", conversationHandler::messagesFromConversation)
+                .GET("/{conversationId}/messages",
+                        RequestPredicates.queryParam("pageIndex", t -> true)
+                                .and(RequestPredicates.queryParam("pageSize", t -> true)),
+                        conversationHandler::messagesFromConversationPaged)
                 .GET("/{conversationId}", conversationHandler::findConversationById)
                 .POST("/{conversationId}/messages", conversationHandler::messageSent)
                 .POST("/{conversationId}/participants/{participantId}",

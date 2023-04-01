@@ -16,5 +16,5 @@ public interface ConversationHandler {
 
     Mono<ServerResponse> findConversationById(ServerRequest serverRequest);
 
-    Mono<ServerResponse> messagesFromConversation(ServerRequest serverRequest);
+    Mono<ServerResponse> messagesFromConversationPaged(ServerRequest serverRequest);
 }
