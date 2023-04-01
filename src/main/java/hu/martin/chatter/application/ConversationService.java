@@ -28,6 +28,8 @@ public interface ConversationService {
 
     Flux<Message> messagesFrom(ConversationId conversationId);
 
+    Flux<MessageId> messageIdsFrom(ConversationId conversationId);
+
     Flux<Message> messagesByChronologicalOrderFrom(ConversationId conversationId);
 
     Mono<Void> removeFromConversation(ConversationId conversationId, ParticipantId participantId);

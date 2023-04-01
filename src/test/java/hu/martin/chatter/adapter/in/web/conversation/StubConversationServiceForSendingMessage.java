@@ -72,6 +72,11 @@ public class StubConversationServiceForSendingMessage implements ConversationSer
     }
 
     @Override
+    public Flux<MessageId> messageIdsFrom(ConversationId conversationId) {
+        return null;
+    }
+
+    @Override
     public Flux<Message> messagesByChronologicalOrderFrom(ConversationId conversationId) {
         return null;
     }

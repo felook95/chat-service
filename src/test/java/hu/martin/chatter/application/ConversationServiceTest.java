@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -247,6 +248,19 @@ class ConversationServiceTest {
     }
 
     @Test
+    void messageIdsForConversationReturnsAllMessageIds() {
+        ConversationService conversationService = ConversationServiceFactory.withDefaults();
+        ConversationId conversationId = conversationService.startConversation().block().getId();
+        List<MessageId> savedMessageIds = saveNCountRandomMessageToConversation(conversationService, conversationId, 10)
+                .stream().map(Message::id).toList();
+
+        List<MessageId> messageIds = conversationService.messageIdsFrom(conversationId).collectList().block();
+
+        assertThat(messageIds)
+                .hasSameElementsAs(savedMessageIds);
+    }
+
+    @Test
     void conversationReturnsMessagesInChronologicalOrder() {
         ConversationService conversationService = getConversationServiceWithTimeProviderInMixedOrder();
         ConversationId conversationId = conversationService.startConversation().block().getId();
@@ -273,20 +287,25 @@ class ConversationServiceTest {
         return ConversationServiceFactory.withTimeProvider(orderedTimeProvider);
     }
 
-    private void saveNCountRandomMessageToConversation(ConversationService conversationService,
-                                                       ConversationId conversationId, int count) {
+    private List<Message> saveNCountRandomMessageToConversation(ConversationService conversationService,
+                                                                ConversationId conversationId, int count) {
+        List<Message> savedMessages = new ArrayList<>();
+        Message savedMessage;
         for (int i = 0; i < count; i++) {
-            saveRandomMessageToConversation(conversationService, conversationId);
+            savedMessage = saveRandomMessageToConversation(conversationService, conversationId);
+            savedMessages.add(savedMessage);
         }
+        return savedMessages;
     }
 
-    private void saveRandomMessageToConversation(ConversationService conversationService, ConversationId conversationId) {
+    private Message saveRandomMessageToConversation(ConversationService conversationService, ConversationId conversationId) {
         ParticipantId senderId = ParticipantId.of(BigInteger.valueOf(1L));
         MessageContent messageContent = MessageContent.of("");
         conversationService.joinParticipantTo(conversationId, senderId).block();
-        MessageId savedMessageId = conversationService.receiveMessage(
-                new Message(senderId, messageContent)).block().id();
-        conversationService.sendMessageTo(savedMessageId, conversationId).block();
+        Message savedMessage = conversationService.receiveMessage(
+                new Message(senderId, messageContent)).block();
+        conversationService.sendMessageTo(savedMessage.id(), conversationId).block();
+        return savedMessage;
     }
 
     @Test

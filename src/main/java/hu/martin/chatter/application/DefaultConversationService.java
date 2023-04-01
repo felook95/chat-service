@@ -25,8 +25,7 @@ public class DefaultConversationService implements ConversationService {
 
     private final TimeProvider timeProvider;
 
-    public DefaultConversationService(ConversationRepository conversationRepository, MessageRepository messageRepository,
-                                      TimeProvider timeProvider) {
+    public DefaultConversationService(ConversationRepository conversationRepository, MessageRepository messageRepository, TimeProvider timeProvider) {
         this.conversationRepository = conversationRepository;
         this.messageRepository = messageRepository;
         this.timeProvider = timeProvider;
@@ -119,6 +118,12 @@ public class DefaultConversationService implements ConversationService {
     @Override
     public Flux<Message> messagesFrom(ConversationId conversationId) {
         return findConversationById(conversationId).map(Conversation::messages).flatMapMany(this::messagesByIds);
+    }
+
+    @Override
+    public Flux<MessageId> messageIdsFrom(ConversationId conversationId) {
+        return findConversationById(conversationId)
+                .flatMapMany(conversation -> Flux.fromIterable(conversation.messages()));
     }
 
     private Flux<Message> messagesByIds(Set<MessageId> messageIdsInConversation) {
