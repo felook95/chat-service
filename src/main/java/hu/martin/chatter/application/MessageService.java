@@ -1,9 +1,9 @@
 package hu.martin.chatter.application;
 
+import hu.martin.chatter.application.paging.PageProperties;
 import hu.martin.chatter.domain.message.Message;
 import hu.martin.chatter.domain.message.MessageContent;
 import hu.martin.chatter.domain.message.MessageId;
-import org.springframework.data.domain.PageRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -15,5 +15,5 @@ public interface MessageService {
 
     Mono<Message> editMessageContent(MessageId id, MessageContent newContent);
 
-    Flux<Message> findAllByIdOrderedByCreatedDateTime(List<MessageId> messageIdsToLookFor, PageRequest pageRequest);
+    Flux<Message> findAllByIdOrderedByCreatedDateTime(List<MessageId> messageIdsToLookFor, PageProperties pageProperties);
 }

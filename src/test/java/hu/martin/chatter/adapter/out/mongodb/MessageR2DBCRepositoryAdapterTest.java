@@ -1,5 +1,6 @@
 package hu.martin.chatter.adapter.out.mongodb;
 
+import hu.martin.chatter.application.paging.SortablePageProperties;
 import hu.martin.chatter.domain.message.CreatedDateTime;
 import hu.martin.chatter.domain.message.Message;
 import hu.martin.chatter.domain.message.MessageFactory;
@@ -8,8 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MongoDBContainer;
@@ -74,13 +73,13 @@ class MessageR2DBCRepositoryAdapterTest {
     @Test
     void findByIdsPageableReturnsMessagesOrderedMatchingPageRequest() {
         List<MessageId> savedMessageIds = saveMessagesThenReturnMessageIdsTimes(10);
-        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("createdAt"));
+        SortablePageProperties pageProperties = new SortablePageProperties(0, 3, "createdAt");
 
-        Collection<Message> pagedMessages = messageR2DBCRepositoryAdapter.findByIdsPageable(savedMessageIds, pageRequest)
+        Collection<Message> pagedMessages = messageR2DBCRepositoryAdapter.findByIdsPageable(savedMessageIds, pageProperties)
                 .collectList().block();
 
         assertThat(pagedMessages).isNotNull()
-                .hasSize(pageRequest.getPageSize())
+                .hasSize(pageProperties.pageSize())
                 .extracting(Message::createdDateTime)
                 .extracting(CreatedDateTime::createdDateTime)
                 .isSorted();

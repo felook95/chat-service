@@ -1,8 +1,8 @@
 package hu.martin.chatter.application.port;
 
+import hu.martin.chatter.application.paging.SortablePageProperties;
 import hu.martin.chatter.domain.message.Message;
 import hu.martin.chatter.domain.message.MessageId;
-import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -17,5 +17,5 @@ public interface MessageRepository {
 
     Flux<Message> findByIds(Set<MessageId> messageIdsToLookFor);
 
-    Flux<Message> findByIdsPageable(List<MessageId> messageIdsToLookFor, Pageable pageable);
+    Flux<Message> findByIdsPageable(List<MessageId> messageIdsToLookFor, SortablePageProperties pageProperties);
 }

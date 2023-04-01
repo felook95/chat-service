@@ -1,9 +1,9 @@
 package hu.martin.chatter.adapter.out.inmemory;
 
+import hu.martin.chatter.application.paging.SortablePageProperties;
 import hu.martin.chatter.application.port.MessageRepository;
 import hu.martin.chatter.domain.message.Message;
 import hu.martin.chatter.domain.message.MessageId;
-import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -45,9 +45,9 @@ public class InMemoryMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Flux<Message> findByIdsPageable(List<MessageId> messageIdsToLookFor, Pageable pageable) {
-        int fromIndex = pageable.getPageSize() * pageable.getPageNumber();
-        int toIndex = pageable.getPageSize();
+    public Flux<Message> findByIdsPageable(List<MessageId> messageIdsToLookFor, SortablePageProperties pageProperties) {
+        int fromIndex = pageProperties.pageSize() * pageProperties.pageIndex();
+        int toIndex = pageProperties.pageSize();
 
         LinkedList<Message> messagesList = new LinkedList<>(messages.values());
         Collections.reverse(messagesList);
