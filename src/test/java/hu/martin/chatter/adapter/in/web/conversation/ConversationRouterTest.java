@@ -56,7 +56,7 @@ class ConversationRouterTest {
         client.get().uri("/conversation/" + conversationId).exchange().expectStatus().isOk()
                 .expectBody().json("""
                         {
-                           "id":%s,
+                           "id":"%s",
                            "participantIds":[],
                            "messageIds":[]
                         }
@@ -87,8 +87,8 @@ class ConversationRouterTest {
         client.post().uri("/conversation/1/messages")
                 .body(Mono.just(messageDTO), MessageDTO.class).exchange().expectBody().json("""
                         {
-                           "id":1,
-                           "senderId":1,
+                           "id":"1",
+                           "senderId":"1",
                            "content":"",
                            "createdDateTime":"2022-11-03T18:27:40.005661434"
                         }
@@ -108,7 +108,7 @@ class ConversationRouterTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody().json("""
-                        [{"senderId":1,"content":"","createdDateTime":"2022-11-03T18:38:20.005661434"}]
+                        [{"senderId":"1","content":"","createdDateTime":"2022-11-03T18:38:20.005661434"}]
                         """);
     }
 
