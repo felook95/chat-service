@@ -10,6 +10,28 @@ const lightenRate = 7.5;
 const darkenRate = 15;
 
 const DefaultTheme = {
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        html: {
+          width: '100vw',
+          height: '100vh',
+          overflow: 'hidden',
+        },
+        body: {
+          width: '100vw',
+          height: '100vh',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+        },
+        '#root': {
+          height: '100%',
+          width: '100%',
+        },
+      },
+    },
+  },
   palette: {
     primary: {
       main: primary,

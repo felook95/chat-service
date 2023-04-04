@@ -7,7 +7,7 @@ const MainRouter = () => {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
-      <Route path="/chat/:userName" element={<Chat />} />
+      <Route path="/chat/:conversationId" element={<Chat />} />
     </Routes>
   );
 };

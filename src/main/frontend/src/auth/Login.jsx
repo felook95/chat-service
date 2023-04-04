@@ -8,6 +8,7 @@ import {
   Container,
   TextField,
 } from '@mui/material';
+import { startConversation } from '../chat/api-conversation';
 
 const Login = () => {
   const [values, setValues] = useState({ userName: '' });
@@ -21,7 +22,7 @@ const Login = () => {
   };
 
   const handleSubmitClick = () => {
-    navigate(`/chat/${values.userName}`);
+    startConversation().then(({ id }) => navigate(`/chat/${id}`));
   };
 
   return (

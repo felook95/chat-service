@@ -1,12 +1,34 @@
-import { Container } from '@mui/material';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import MessageInputField from './MessageInputField';
 import Messages from './Messages';
+import { joinToConversation, sendMessage } from './api-conversation';
+import Grid from '@mui/material/Unstable_Grid2/Grid2';
+import { Box } from '@mui/material';
 
 const Chat = () => {
+  const { conversationId } = useParams();
+
+  useEffect(() => {
+    joinToConversation(conversationId, 1);
+    setParticipants(conversationId).then(setParticipants);
+  }, [conversationId]);
+
+  const handleSendMessage = (messageToSend) => {
+    sendMessage(conversationId, messageToSend);
+  };
+
   return (
-    <Container>
-      <Messages conversationId="30985741588397402187497635722" />
-    </Container>
+    <Grid container marginX={1} height={'100%'} direction={'column'}>
+      <Grid item sx={{ flex: 1, display: 'flex', overflowY: 'auto' }} xs={12}>
+        <Messages conversationId={conversationId} />
+      </Grid>
+      <Grid item xs={12}>
+        <Box mb={1}>
+          <MessageInputField onSendMessage={handleSendMessage} />
+        </Box>
+      </Grid>
+    </Grid>
   );
 };
 
