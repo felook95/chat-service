@@ -11,7 +11,7 @@ const Messages = ({ conversationId }) => {
       getMessagesPaged(conversationId, currentPage, 100).then(setMessages);
     }, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [conversationId, currentPage]);
 
   return (
     <List>
