@@ -11,7 +11,6 @@ const Chat = () => {
 
   useEffect(() => {
     joinToConversation(conversationId, 1);
-    setParticipants(conversationId).then(setParticipants);
   }, [conversationId]);
 
   const handleSendMessage = (messageToSend) => {

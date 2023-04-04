@@ -4,6 +4,7 @@ import { getMessagesPaged } from './api-conversation';
 
 const Messages = ({ conversationId }) => {
   const [messages, setMessages] = useState([]);
+  const [currentPage] = useState([]);
 
   useEffect(() => {
     const interval = setInterval(() => {
