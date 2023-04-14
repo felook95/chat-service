@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Button,
@@ -14,12 +14,13 @@ const Login = () => {
   const [values, setValues] = useState({ userName: '' });
   const navigate = useNavigate();
 
-  const handleChange = (name) => (event) => {
-    setValues({
-      ...values,
-      [name]: event.target.value,
-    });
-  };
+  const handleChange =
+    (name: string) => (event: ChangeEvent<HTMLTextAreaElement>) => {
+      setValues({
+        ...values,
+        [name]: event.target.value,
+      });
+    };
 
   const handleSubmitClick = () => {
     startConversation().then(({ id }) => navigate(`/chat/${id}`));

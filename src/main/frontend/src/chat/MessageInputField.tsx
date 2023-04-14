@@ -1,15 +1,20 @@
 import { TextField } from '@mui/material';
-import React, { useState } from 'react';
+import React, { KeyboardEvent, useState } from 'react';
+import Message from './Message';
 
-const MessageInputField = ({ onSendMessage }) => {
+interface Props {
+  onSendMessage: (message: Message) => void;
+}
+
+const MessageInputField = ({ onSendMessage }: Props) => {
   const [message, setMessage] = useState('');
 
-  const handleKeyDown = (keyDownEvent) => {
+  const handleKeyDown = (keyDownEvent: KeyboardEvent<HTMLImageElement>) => {
     if (keyDownEvent.key === 'Enter' && !keyDownEvent.shiftKey) {
       keyDownEvent.preventDefault();
 
-      const messageToSend = {
-        senderId: 1,
+      const messageToSend: Message = {
+        senderId: '1',
         content: message,
       };
       onSendMessage(messageToSend);

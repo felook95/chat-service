@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Avatar, Box, List, ListItem, Typography } from '@mui/material';
 import { getMessagesPaged } from './api-conversation';
+import Message from './Message';
 
-const Messages = ({ conversationId }) => {
-  const [messages, setMessages] = useState([]);
-  const [currentPage] = useState([]);
+interface Props {
+  conversationId: string;
+}
+
+const Messages = ({ conversationId }: Props) => {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [currentPage] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -19,7 +24,7 @@ const Messages = ({ conversationId }) => {
         return (
           <ListItem key={crypto.randomUUID()}>
             <Box mr={1}>
-              <Avatar>{message.sender}</Avatar>
+              <Avatar>{message.senderId}</Avatar>
             </Box>
             <Typography sx={{ whiteSpace: 'pre' }} variant="h6">
               {message.content}

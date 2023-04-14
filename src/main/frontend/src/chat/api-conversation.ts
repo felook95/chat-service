@@ -1,23 +1,29 @@
+import Message from './Message';
+
 const startConversation = () => {
   return fetch('/conversation/', { method: 'POST' }).then((data) =>
     data.json()
   );
 };
 
-const joinToConversation = (conversationId, participantId) => {
+const joinToConversation = (conversationId: string, participantId: string) => {
   return fetch(
     `/conversation/${conversationId}/participants/${participantId}`,
     { method: 'POST' }
   );
 };
 
-const getMessagesPaged = (conversationId, pageIndex, pageSize) => {
+const getMessagesPaged = (
+  conversationId: string,
+  pageIndex: number,
+  pageSize: number
+) => {
   return fetch(
     `/conversation/${conversationId}/messages?pageIndex=${pageIndex}&pageSize=${pageSize}`
   ).then((data) => data.json());
 };
 
-const sendMessage = (conversationId, message) => {
+const sendMessage = (conversationId: string, message: Message) => {
   return fetch(`/conversation/${conversationId}/messages`, {
     method: 'POST',
     headers: {
@@ -28,7 +34,7 @@ const sendMessage = (conversationId, message) => {
   });
 };
 
-const getParticipants = (conversationId) => {
+const getParticipants = (conversationId: string) => {
   return fetch(`/conversation/${conversationId}/participants`).then((data) =>
     data.json()
   );
