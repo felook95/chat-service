@@ -1,16 +1,19 @@
+import Conversation from './Conversation';
 import Message from './Message';
+import axios from 'axios';
+
+const apiClient = axios.create();
 
 const startConversation = () => {
-  return fetch('/conversation/', { method: 'POST' }).then((data) =>
-    data.json()
-  );
+  return apiClient.post<Conversation>('/conversation').then((res) => res.data);
 };
 
 const joinToConversation = (conversationId: string, participantId: string) => {
-  return fetch(
-    `/conversation/${conversationId}/participants/${participantId}`,
-    { method: 'POST' }
-  );
+  return apiClient
+    .post<Conversation>(
+      `/conversation/${conversationId}/participants/${participantId}`
+    )
+    .then((res) => res.data);
 };
 
 const getMessagesPaged = (
@@ -18,32 +21,17 @@ const getMessagesPaged = (
   pageIndex: number,
   pageSize: number
 ) => {
-  return fetch(
-    `/conversation/${conversationId}/messages?pageIndex=${pageIndex}&pageSize=${pageSize}`
-  ).then((data) => data.json());
+  return apiClient
+    .get<Message[]>(
+      `/conversation/${conversationId}/messages?pageIndex=${pageIndex}&pageSize=${pageSize}`
+    )
+    .then((res) => res.data);
 };
 
 const sendMessage = (conversationId: string, message: Message) => {
-  return fetch(`/conversation/${conversationId}/messages`, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(message),
-  });
+  return apiClient
+    .post<Message>(`/conversation/${conversationId}/messages`, message)
+    .then((res) => res.data);
 };
 
-const getParticipants = (conversationId: string) => {
-  return fetch(`/conversation/${conversationId}/participants`).then((data) =>
-    data.json()
-  );
-};
-
-export {
-  startConversation,
-  joinToConversation,
-  getMessagesPaged,
-  sendMessage,
-  getParticipants,
-};
+export { startConversation, joinToConversation, getMessagesPaged, sendMessage };
